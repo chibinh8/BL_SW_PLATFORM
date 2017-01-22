@@ -55,6 +55,8 @@ osThreadId defaultTaskHandle;
 
 void StartDefaultTask(void const * argument);
 void StartUserTask(void const * argument);
+void Start10msTask(void const * argument);
+
 
 /* USER CODE BEGIN PFP */
 /* Private function prototypes -----------------------------------------------*/
@@ -110,13 +112,16 @@ int main(void)
 
   /* Create the thread(s) */
   /* definition and creation of defaultTask */
-  osThreadDef(defaultTask, StartDefaultTask, osPriorityNormal, 0, 128);
+  osThreadDef(defaultTask, StartDefaultTask, osPriorityNormal, 0, 50);
   defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
-	 osThreadDef(UserTask, StartUserTask, osPriorityAboveNormal, 0, 128);
+	 osThreadDef(UserTask, StartUserTask, osPriorityAboveNormal, 0, 50);
    defaultTaskHandle = osThreadCreate(osThread(UserTask), NULL);	 
+	 
+	 osThreadDef(RT10msTask, Start10msTask, osPriorityAboveNormal, 1, 128);
+   defaultTaskHandle = osThreadCreate(osThread(RT10msTask), NULL);
   /* USER CODE END RTOS_THREADS */
 
   /* USER CODE BEGIN RTOS_QUEUES */
@@ -157,14 +162,24 @@ void StartUserTask(void const * argument)
 		/*if rx BUFFER is available then copy to user's buffer*/
 		if(TRUE==GetDataRXcomplete(&BL_UART,Rx_Buffer_t))
 			printf ("Received Data: %s \n", Rx_Buffer_t);
-		ReadSensor(&outsensorval, &hadc1,12);
-		//if(outsensorval!=0) 
-			printf ("ADC Data: %d \n", outsensorval);
 		HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_13);
     osDelay(1000);
   }
+}
+	/* StartDefaultTask function */
+void Start10msTask(void const * argument)
+{
+  /* USER CODE BEGIN 5 */
+  /* Infinite loop */
+  for(;;)
+  {	
+		ReadAllRawSensorfromLine();
+    osDelay(20);
+  }
   /* USER CODE END 5 */ 
 }
+	
+  /* USER CODE END 5 */ 
 /* USER CODE END 4 */
 
 /* StartDefaultTask function */
@@ -175,16 +190,7 @@ void StartDefaultTask(void const * argument)
   /* Infinite loop */
   for(;;)
   {	
-		if((togloop)==1){
-		 SetDirectionMotor(MOTORBACK, MOTORLEFT);
-		 togloop = 0;
-		}
-		else{
-			SetDirectionMotor(MOTORFORWARD, MOTORLEFT);
-			togloop = 1;
-		}		
-
-    HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_12);
+		
     osDelay(1000);
   }
   /* USER CODE END 5 */ 
