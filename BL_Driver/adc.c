@@ -1,44 +1,72 @@
 #include "adc.h"
 #include "string.h"
-#include "BL_Define.h"
-
-#define NumofSampling 4
-#define NumofSensor (uint8_t)(NumOfSensor1+NumOfSensor2)
-#define NumOfSensor1 7
-#define NumOfSensor2 1
+#include "timer.h"
 
 ADC_HandleTypeDef hadc1;
+
+#ifdef USEADC2
 ADC_HandleTypeDef hadc2;
+#endif
+
+#define BLACKOFFSET   1 
+#define WHITEOFFSET   1 
 
 //ring buffer for each sensor sor will be allocated to make signal smooth
 //there are 8 sensors
 
 uint16_t ringbuff[NumofSensor][NumofSampling] = {0};
 uint16_t FilteredSensorVal[NumofSensor]={0};
+ADCMode ADCSensorRunmode = CYCLIC;
 
 static uint8_t IsFilterDone = FALSE;
+static uint16_t ADCSensorBlackUpperThres[NumofSensor] = {0};
+static uint16_t ADCSensorWhiteLowerThres[NumofSensor] = {0};
+
+BL_AdcThres_Type adcreadthres; //Adc threshold stored value in FLASH during learning color
 
 static void MX_ADC1_Init(void);
+#ifdef USEADC2
 static void MX_ADC2_Init(void);
-/*Configure table of sensor channel which s mapping with ADC channel*/
-const uint8_t SensorChannelADC1tbl[NumOfSensor1] = {0};
-const uint8_t SensorChannelADC2tbl[NumOfSensor2] = {0};
+#endif
+/*Configure table of sensor channel which s mapping with ADC channel
+    PC0     ------> ADC1_IN10
+    PC1     ------> ADC1_IN11
+    PC2     ------> ADC1_IN12
+    PA1     ------> ADC1_IN1
+    PC4     ------> ADC1_IN14
+    PC5     ------> ADC1_IN15
+    PB0     ------> ADC1_IN8
+    PB1     ------> ADC1_IN9 
+*/
+const uint32_t SensorChannelADC1tbl[NumOfSensor1] = { ADC_CHANNEL_10, ADC_CHANNEL_11, ADC_CHANNEL_12, ADC_CHANNEL_1, ADC_CHANNEL_14, ADC_CHANNEL_15, ADC_CHANNEL_8, ADC_CHANNEL_9};
+#ifdef USEADC2
+const uint32_t SensorChannelADC2tbl[NumOfSensor2] = {0};
+#endif
 static uint8_t EleBuffIndex = 0;
 
+
 static void InitRingbuffsensor(void){
-		memset((uint16_t*)ringbuff, 0, (uint8_t)(NumofSampling*NumofSensor));
-		memset((uint16_t*)FilteredSensorVal, 0, NumofSensor);
+		memset((uint16_t*)ringbuff, 0, (uint8_t)(NumofSampling*NumofSensor*sizeof(uint16_t)));
+		memset((uint16_t*)FilteredSensorVal, 0, NumofSensor*2);
+		memset((uint16_t*)adcreadthres.blackupperthres, 0, NumofSensor*sizeof(uint16_t));
+		memset((uint16_t*)adcreadthres.whitelowwerthres, 0, NumofSensor*sizeof(uint16_t));
 }
 
 void BL_ADCInit(void){
-	
+	BL_AdcThres_Type adcthres_t;
+	ADCSensorRunmode = CYCLIC;
 	MX_ADC1_Init(); //configure ADC 1,2 
-	MX_ADC2_Init();
 	HAL_ADC_Start(&hadc1);
+	#ifdef USEADC2
+	MX_ADC2_Init();
 	HAL_ADC_Start(&hadc2);
+	#endif
 	InitRingbuffsensor();
+	/*Read threshold for black and White status from flash memmory*/
+	ReadADCThreshold(&adcthres_t);
+	memcpy(ADCSensorBlackUpperThres, (const uint16_t*)adcthres_t.blackupperthres, NumofSensor*sizeof(uint16_t));
+	memcpy(ADCSensorWhiteLowerThres, (const uint16_t*)adcthres_t.whitelowwerthres, NumofSensor*sizeof(uint16_t));
 }
-
 
 /* ADC1 init function */
 static void MX_ADC1_Init(void)
@@ -70,6 +98,7 @@ static void MX_ADC1_Init(void)
 
 }
 
+#ifdef USEADC2
 /* ADC2 init function */
 static void MX_ADC2_Init(void)
 {
@@ -99,7 +128,7 @@ static void MX_ADC2_Init(void)
   HAL_ADC_ConfigChannel(&hadc2, &sConfig);
 
 }
-
+#endif
 
 void ReadSensor(volatile uint16_t* outsensorval, ADC_HandleTypeDef *hadc, uint8_t channel){
 	
@@ -120,7 +149,7 @@ void ReadSensor(volatile uint16_t* outsensorval, ADC_HandleTypeDef *hadc, uint8_
 	 *outsensorval = (uint16_t)(tempsensor&0x0FFF);	 
 }
 
-/*Run in task 10 ms*/
+/*Run in task 50 ms*/
 
 void ReadAllRawSensorfromLine(void){
 	uint16_t SensorRawVal;
@@ -129,32 +158,137 @@ void ReadAllRawSensorfromLine(void){
 			ReadSensor(&SensorRawVal,&hadc1,SensorChannelADC1tbl[i]);
 			/*update sensor val for ring buff at index EleBuffIndex*/
 			ringbuff[i][EleBuffIndex] = SensorRawVal;
-			for(int j=0; i<NumofSampling;j++)
+			for(int j=0; j<NumofSampling;j++)
 					total_t += ringbuff[i][j];
 			FilteredSensorVal[i] = total_t/NumofSampling;		
 	}	
+	#ifdef USEADC2
 	for(int i=0; i<NumOfSensor2; i++){
 			ReadSensor(&SensorRawVal,&hadc2,SensorChannelADC2tbl[i]);
 			/*update sensor val for ring buff at index EleBuffIndex*/
 			ringbuff[NumOfSensor1+i][EleBuffIndex] = SensorRawVal;
-			for(int j=0; i<NumofSampling;j++)
+			for(int j=0; j<NumofSampling;j++)
 					total_t += ringbuff[NumOfSensor1+i][j];
 			FilteredSensorVal[NumOfSensor1+i] = total_t/NumofSampling;					
 	}	
-	
+	#endif
 	if(EleBuffIndex==NumofSampling) {		
 		IsFilterDone = TRUE; //reading is ok only if it's already sampled 4 times
 		EleBuffIndex = 0; //reset buffer index
 	}else{
 		EleBuffIndex++;
+		
 	}
 }
 
-/*piblic API to get final val for all sensor and reading status*/
+/*public API to get final val for all sensor and reading status*/
 
 uint8_t ReadAllFinalSensorfromLine(uint16_t *AllsensorFinalVal){
 	
-	if(IsFilterDone==TRUE) AllsensorFinalVal = FilteredSensorVal;
-	
-	return IsFilterDone;	
+	if(IsFilterDone==TRUE) {
+		memcpy(AllsensorFinalVal, FilteredSensorVal, NumofSensor*2);
+		IsFilterDone = FALSE;
+		return TRUE;	
+	}	
+	return FALSE;
 }
+
+/*Converting Digital input to physical status of sensor
+BLACK --> if digital input is greater or equal to it's lower threshold
+WHITE --> if digital input is lower or equal to it's lower threshold
+Note: Threshold is calibrated value which is stored in flalsh memory before.
+*/
+
+uint8_t ReadStatusofAllsensor(uint8_t * OutStatusSS){
+	
+	if(IsFilterDone==TRUE) {
+		for(int i=0; i<NumofSensor; i++){
+				if(FilteredSensorVal[i]>=(ADCSensorBlackUpperThres[i]- BLACKOFFSET))
+					OutStatusSS[i] = BLACK;
+				else if(FilteredSensorVal[i]<=(ADCSensorWhiteLowerThres[i]+ WHITEOFFSET))
+					OutStatusSS[i] = WHITE;
+				else {
+					OutStatusSS[i] = UNDEFINE;	//The input value is not in defined range.			
+					//do nothing
+				}	
+			}
+		IsFilterDone = FALSE;
+		return TRUE;	
+	}	
+	return FALSE;	
+}
+
+void Debouncing( void *DebouncedVal, uint16_t debouncecnt){
+	/*to be defined later*/
+	
+}
+volatile uint8_t bl_adc_Calibstat_u8 = 255;
+
+/*Calibration mode*/
+void SensorThresCalib(void){
+	/*Following calibration steps should be done to get the best value for sensor
+		1. Read ADC with BLACK color
+			- While sampling for WHITE threshold is still not requested, get ADC for BLACK color, update with bigest value for sometime.
+			- Change state to read ADC for WHITE threshold if requested
+		2. Read ADC with WHITE color 
+			- While sampling for BLACK threshold is still not requested, get ADC for WHITE color, update with lowest value for sometime.
+			- Change state to read ADC for BLACK threshold if requested			
+		3. Save threshold to flash
+	Note: bl_adc_Calibstat_u8 is changed by DiagCom request DA-02-03-[DID] with DID: state number
+	*/
+	uint32_t currtime_u32 =0;
+	
+	ReadAllRawSensorfromLine();
+	
+	switch (bl_adc_Calibstat_u8){
+		
+		case 1: //read ADC for BACLK color
+			memcpy((void*)adcreadthres.blackupperthres, FilteredSensorVal, NumofSensor);
+			
+			break;
+		case 2: 
+			memcpy((void*)adcreadthres.whitelowwerthres, FilteredSensorVal, NumofSensor);
+		
+			break;
+		case 3: //save ADC value to Flash			
+			if(HAL_OK==SaveADCThreshold2NVM(adcreadthres)){
+						bl_adc_Calibstat_u8 = 4;//default val, if saving process is not sucessfilly, try in next cycle
+						//get current time
+					  GetCurrentTimestamp(&currtime_u32);
+			}
+			break;
+		case 4 : 			
+				if(FALSE==CheckTimestampElapsed(currtime_u32, 1000)) //1s
+					//blink LED to indicate NVM writing threshold process is done
+						HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_12);
+				else
+					bl_adc_Calibstat_u8 = 255; //change to default state
+		
+		default:
+				/*do nothing*/
+				break;
+	}
+	
+}
+
+
+
+void ADCSensorMaincyclic(void){
+	
+	switch(ADCSensorRunmode){
+		case CALIB:
+			 SensorThresCalib();
+			 /*change state condition should be added here*/
+			
+		   break;
+		case CYCLIC:			 
+				ReadAllRawSensorfromLine();
+				/*change state condition should be added here*/
+				break;
+		default:			
+				break;		
+	}	
+}
+
+
+
