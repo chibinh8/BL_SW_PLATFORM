@@ -4,19 +4,22 @@
 #endif 
 #include "BL_Define.h"
 
+
+#ifndef BL_UART_H
+#define BL_UART_H
 #define BL_UART huart2
 #define BL_UARTIncstance   USART2
 #define BL_UARTIRQFuncHandler USART2_IRQHandler
-#define BL_BUFFSIZE 100
-#define BAUDRATE  9600
+#define BL_BUFFSIZE 10
+#define BAUDRATE  115200
 
-
+void ClearRxBuffer(void);
 void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart);
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart);
 void USART2_IRQHandler(void);
 void MX_USART_UART_Init(void);
 
-uint8_t GetDataRXcomplete(UART_HandleTypeDef *huart, const char *outbuffer);
+uint8_t GetDataRXcomplete(UART_HandleTypeDef *huart, const char *outbuffer, uint8_t Readoption, uint8_t size);
 
 #ifdef __GNUC__
   /* With GCC/RAISONANCE, small printf (option LD Linker->Libraries->Small printf
@@ -31,3 +34,7 @@ uint8_t GetDataRXcomplete(UART_HandleTypeDef *huart, const char *outbuffer);
   * @param  None
   * @retval None
   */
+	
+#endif
+	
+	

@@ -35,6 +35,11 @@
 #include "FreeRTOS.h"
 #include "task.h"
 
+#ifndef STM32F4XX_HAL
+#define STM32F4XX_HAL
+#include "stm32f4xx_hal.h"
+#endif 
+
 /* USER CODE BEGIN Includes */     
 
 /* USER CODE END Includes */
@@ -57,6 +62,9 @@ void vApplicationStackOverflowHook(xTaskHandle xTask, signed char *pcTaskName);
 /* USER CODE BEGIN 4 */
 void vApplicationStackOverflowHook(xTaskHandle xTask, signed char *pcTaskName)
 {
+	
+	HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_SET);
+	
    /* Run time stack overflow checking is performed if
    configCHECK_FOR_STACK_OVERFLOW is defined to 1 or 2. This hook function is
    called if a stack overflow is detected. */

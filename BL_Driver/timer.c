@@ -36,7 +36,16 @@ void TIM6_DAC_IRQHandler(void)
 }
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
-	if(htim->Instance==TIM6)
-		HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_12);
 	
+	if(htim->Instance==TIM6)
+		HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_12);	
 }
+/*Timebased is 1 milisecond for 1 tick */
+inline uint8_t CheckTimestampElapsed(uint32_t timestart_u32, uint32_t period_u32){
+	return ((HAL_GetTick()-timestart_u32)>=period_u32)?TRUE:FALSE;
+}
+
+inline void GetCurrentTimestamp(uint32_t *timecurr_u32){
+		*timecurr_u32 = HAL_GetTick();
+}
+

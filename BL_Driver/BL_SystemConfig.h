@@ -10,4 +10,7 @@
 #include "BL_SystemInit.h"
 #include "pwm.h"
 #include "timer.h"
+#include "DiagCom.h"
+#include "string.h"
+#include "esp8266.h"
 

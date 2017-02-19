@@ -66,8 +66,8 @@ void Start10msTask(void const * argument);
 /* USER CODE BEGIN 0 */
  extern UART_HandleTypeDef BL_UART;
  extern ADC_HandleTypeDef hadc1;
- static uint16_t outsensorval;
  extern TIM_HandleTypeDef htim6;
+
 /* USER CODE END 0 */
 
 int main(void)
@@ -90,11 +90,12 @@ int main(void)
 	/*ADC Init*/
 	BL_ADCInit();
 	/*UART Init*/
+	#ifdef BL_TIM6
   MX_TIM6_Init();
+	#endif
   MX_USART_UART_Init();
 	InitPwm2Motors();
-	
-  /* USER CODE BEGIN 2 */
+  /* USER CODE BEGIN 2 */ 
 
   /* USER CODE END 2 */
 
@@ -117,7 +118,7 @@ int main(void)
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
-	 osThreadDef(UserTask, StartUserTask, osPriorityAboveNormal, 0, 50);
+	 osThreadDef(UserTask, StartUserTask, osPriorityAboveNormal, 0, 128);//128*4 = 512 byte
    defaultTaskHandle = osThreadCreate(osThread(UserTask), NULL);	 
 	 
 	 osThreadDef(RT10msTask, Start10msTask, osPriorityAboveNormal, 1, 128);
@@ -127,7 +128,6 @@ int main(void)
   /* USER CODE BEGIN RTOS_QUEUES */
   /* add queues, ... */
   /* USER CODE END RTOS_QUEUES */
- 
 
   /* Start scheduler */
   osKernelStart();
@@ -152,28 +152,30 @@ int main(void)
 
 void StartUserTask(void const * argument)
 {
-
+	uint16_t dutyrcservo =0;
   /* USER CODE BEGIN 5 */
+		if(E_OK==InitESp8266())
+			HAL_GPIO_WritePin(GPIOD, GPIO_PIN_14, GPIO_PIN_RESET);
+		else
+			HAL_GPIO_WritePin(GPIOD, GPIO_PIN_14, GPIO_PIN_SET);
+		InitRCServo();
   /* Infinite loop */
-  for(;;)
-  {
-		
-		char Rx_Buffer_t[BL_BUFFSIZE];
-		/*if rx BUFFER is available then copy to user's buffer*/
-		if(TRUE==GetDataRXcomplete(&BL_UART,Rx_Buffer_t))
-			printf ("Received Data: %s \n", Rx_Buffer_t);
-		HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_13);
-    osDelay(1000);
-  }
+		for(;;)
+		{ 
+			ProcessDiagserviceCyclicMain();
+			osDelay(1000);
+		}
 }
 	/* StartDefaultTask function */
 void Start10msTask(void const * argument)
 {
+	
   /* USER CODE BEGIN 5 */
   /* Infinite loop */
   for(;;)
   {	
-		ReadAllRawSensorfromLine();
+		
+		ADCSensorMaincyclic();
     osDelay(20);
   }
   /* USER CODE END 5 */ 
@@ -185,7 +187,6 @@ void Start10msTask(void const * argument)
 /* StartDefaultTask function */
 void StartDefaultTask(void const * argument)
 {
-	static uint8_t togloop = 0;
   /* USER CODE BEGIN 5 */
   /* Infinite loop */
   for(;;)

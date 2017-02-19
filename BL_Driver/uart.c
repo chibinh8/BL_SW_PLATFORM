@@ -5,6 +5,7 @@ UART_HandleTypeDef BL_UART;
 static uint8_t IsRxcpltFlag_b = FALSE ;
 static char Rx_data[2], Rx_Buffer[BL_BUFFSIZE];
 uint8_t Rx_indx =0;
+
 /* USART init function */
 void MX_USART_UART_Init(void)
 {
@@ -25,9 +26,9 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart){
 	/*Once 1 charater is recieved, this callback function will be invoked*/
 		/*Indicate data received*/	
 	  if (huart->Instance == BL_UARTIncstance)	//current UART
-		{	
+		{	if(Rx_data[0]=='O') HAL_GPIO_WritePin(GPIOD, GPIO_PIN_14, GPIO_PIN_SET);
 			if ((Rx_data[0]!=13)&&(Rx_data[0]!=10))	//if received data different from ascii 13 (enter)
-				{
+				{	
 					if(Rx_indx==(BL_BUFFSIZE-1)) Rx_indx=0; //reset buffer index in case lengh of input string over buffer
 					Rx_Buffer[Rx_indx++]=Rx_data[0];	//add data to Rx_Buffer
 				}
@@ -41,21 +42,24 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart){
 		}
 }
 
-uint8_t GetDataRXcomplete(UART_HandleTypeDef *huart, const char *outbuffer){
+uint8_t GetDataRXcomplete(UART_HandleTypeDef *huart, const char *outbuffer, uint8_t Readoption, uint8_t size){
 		uint8_t datarecev_b = FALSE;
 		if (huart->Instance == BL_UARTIncstance){	//current UART
-				if(IsRxcpltFlag_b==TRUE) //if data has been already available then update buffer
-				{ 
-					memcpy((char *)outbuffer,Rx_Buffer,BL_BUFFSIZE); 
-					memset((char *)Rx_Buffer,0,BL_BUFFSIZE); //reset rx buffer after coppying to user buffer
-					IsRxcpltFlag_b = FALSE;
+				if((Readoption==1)||((Readoption==0)&&(IsRxcpltFlag_b==TRUE))) //if data has been already available then update buffer
+				{ //if Readoption =1, read all incoming data else only read data if \r\n is detected
+					memcpy((char *)outbuffer,Rx_Buffer,size); 
 					datarecev_b = TRUE;
 				}
 				else
-					memset((char *)outbuffer,0,BL_BUFFSIZE); 
+					memset((char *)outbuffer,0,size); 
 				return datarecev_b;
 		}
 		return FALSE;
+}
+
+void ClearRxBuffer(void){
+	memset((char *)Rx_Buffer,0,BL_BUFFSIZE);
+	IsRxcpltFlag_b = FALSE;
 }
 
 void USART2_IRQHandler(void)
@@ -68,7 +72,7 @@ void USART2_IRQHandler(void)
 	
   /* USER CODE END USART2_IRQn 1 */
 }	
-#ifdef UARTDEBUG
+#ifdef DEBUG
 void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart){
 	
 	printf ("Error code: %d\n", huart->ErrorCode);		
