@@ -4,9 +4,10 @@ freertos configuration/\cmsis_os.o: ../Middlewares/Third_Party/FreeRTOS/Source/C
 freertos configuration/\cmsis_os.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
 freertos configuration/\cmsis_os.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
 freertos configuration/\cmsis_os.o: ../Drivers/CMSIS/Include/core_cmFunc.h
+freertos configuration/\cmsis_os.o: ../Drivers/CMSIS/Include/cmsis_armcc.h
 freertos configuration/\cmsis_os.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h
 freertos configuration/\cmsis_os.o: ../Inc/FreeRTOSConfig.h
-freertos configuration/\cmsis_os.o: ../Inc/mxconstants.h
+freertos configuration/\cmsis_os.o: ../Inc/main.h
 freertos configuration/\cmsis_os.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h
 freertos configuration/\cmsis_os.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/portable.h
 freertos configuration/\cmsis_os.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/deprecated_definitions.h

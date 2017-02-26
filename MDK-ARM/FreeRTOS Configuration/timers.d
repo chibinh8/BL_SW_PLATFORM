@@ -4,7 +4,7 @@ freertos configuration/\timers.o: ../Middlewares/Third_Party/FreeRTOS/Source/inc
 freertos configuration/\timers.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
 freertos configuration/\timers.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
 freertos configuration/\timers.o: ../Inc/FreeRTOSConfig.h
-freertos configuration/\timers.o: ../Inc/mxconstants.h
+freertos configuration/\timers.o: ../Inc/main.h
 freertos configuration/\timers.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h
 freertos configuration/\timers.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/portable.h
 freertos configuration/\timers.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/deprecated_definitions.h

@@ -2,14 +2,14 @@
   ******************************************************************************
   * @file    stm32f4xx_hal.h
   * @author  MCD Application Team
-  * @version V1.4.1
-  * @date    09-October-2015
+  * @version V1.6.0
+  * @date    04-November-2016
   * @brief   This file contains all the functions prototypes for the HAL 
   *          module driver.
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; COPYRIGHT(c) 2015 STMicroelectronics</center></h2>
+  * <h2><center>&copy; COPYRIGHT(c) 2016 STMicroelectronics</center></h2>
   *
   * Redistribution and use in source and binary forms, with or without modification,
   * are permitted provided that the following conditions are met:
@@ -57,6 +57,7 @@
 
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/
+
 /* Exported macro ------------------------------------------------------------*/
 /** @defgroup HAL_Exported_Macros HAL Exported Macros
   * @{
@@ -149,7 +150,7 @@
                                                       }while(0);
 #endif /* STM32F427xx || STM32F437xx || STM32F429xx || STM32F439xx || STM32F469xx || STM32F479xx */ 
 
-#if defined(STM32F410Tx) || defined(STM32F410Cx) || defined(STM32F410Rx)
+#if defined(STM32F410Tx) || defined(STM32F410Cx) || defined(STM32F410Rx) || defined(STM32F413xx) || defined(STM32F423xx)
 /** @defgroup Cortex_Lockup_Enable Cortex Lockup Enable
   * @{
   */
@@ -170,14 +171,14 @@
 /** @brief  SYSCFG Break PVD lock
   *         Enables and locks the PVD connection with Timer1/8 Break Input, , as well as the PVDE and PLS[2:0] in the PWR_CR register
   * @note   The selected configuration is locked and can be unlocked by system reset
-  */                                                
+  */
 #define __HAL_SYSCFG_BREAK_LOCKUP_LOCK()     do {SYSCFG->CFGR2 &= ~(SYSCFG_CFGR2_LOCKUP_LOCK); \
                                                  SYSCFG->CFGR2 |= SYSCFG_CFGR2_LOCKUP_LOCK;    \
                                                 }while(0)
 /**
  * @}
  */
-#endif /* STM32F410Tx || STM32F410Cx || STM32F410Rx */
+#endif /* STM32F410Tx || STM32F410Cx || STM32F410Rx || STM32F413xx || STM32F423xx */
 /**
   * @}
   */

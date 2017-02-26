@@ -4,7 +4,7 @@ freertos configuration/\event_groups.o: ../Middlewares/Third_Party/FreeRTOS/Sour
 freertos configuration/\event_groups.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
 freertos configuration/\event_groups.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
 freertos configuration/\event_groups.o: ../Inc/FreeRTOSConfig.h
-freertos configuration/\event_groups.o: ../Inc/mxconstants.h
+freertos configuration/\event_groups.o: ../Inc/main.h
 freertos configuration/\event_groups.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h
 freertos configuration/\event_groups.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/portable.h
 freertos configuration/\event_groups.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/deprecated_definitions.h

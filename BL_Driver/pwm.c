@@ -1,9 +1,58 @@
 #include "pwm.h"
+#include "dem.h"
 
 TIM_HandleTypeDef htim1;
 TIM_HandleTypeDef htim3;
 
 static void MX_TIM3_Init(void);
+
+
+void HAL_TIM_MspPostInit(TIM_HandleTypeDef* htim)
+{
+
+  GPIO_InitTypeDef GPIO_InitStruct;
+  if(htim->Instance==TIM1)
+  {
+  /* USER CODE BEGIN TIM1_MspPostInit 0 */
+
+  /* USER CODE END TIM1_MspPostInit 0 */
+    /**TIM1 GPIO Configuration    
+    PE9     ------> TIM1_CH1
+    PE11     ------> TIM1_CH2 
+    */
+    GPIO_InitStruct.Pin = GPIO_PIN_9|GPIO_PIN_11;
+    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+    GPIO_InitStruct.Alternate = GPIO_AF1_TIM1;
+    HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
+
+  /* USER CODE BEGIN TIM1_MspPostInit 1 */
+
+  /* USER CODE END TIM1_MspPostInit 1 */
+  }
+  else if(htim->Instance==TIM3)
+  {
+  /* USER CODE BEGIN TIM3_MspPostInit 0 */
+
+  /* USER CODE END TIM3_MspPostInit 0 */
+  
+    /**TIM3 GPIO Configuration    
+    PB4     ------> TIM3_CH1 
+    */
+    GPIO_InitStruct.Pin = GPIO_PIN_4;
+    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+    GPIO_InitStruct.Alternate = GPIO_AF2_TIM3;
+    HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+  /* USER CODE BEGIN TIM3_MspPostInit 1 */
+
+  /* USER CODE END TIM3_MspPostInit 1 */
+  }
+
+}
 
 static void InitDirectionPin(void){
   /*Configure GPIO pin : motor direction Pin */
@@ -65,7 +114,7 @@ void SetDirectionMotor(uint8_t direction, uint8_t motorindex){
 		}	
 }
 /* TIM1 init function */
-void MX_TIM1_Init(void)
+static void MX_TIM1_Init(void)
 {
   TIM_MasterConfigTypeDef sMasterConfig;
   TIM_BreakDeadTimeConfigTypeDef sBreakDeadTimeConfig;
@@ -116,21 +165,17 @@ void MX_TIM1_Init(void)
     htim1.Init.Period = 167999;	/* 10kHz PWM */
     htim1.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
     htim1.Init.RepetitionCounter = 0;
-		HAL_TIM_PWM_Init(&htim1);
+  if (HAL_TIM_PWM_Init(&htim1) != HAL_OK)
+  {
+    Error_Handler();
+  }
 		sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
 		sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
-		HAL_TIMEx_MasterConfigSynchronization(&htim1, &sMasterConfig);
+  if (HAL_TIMEx_MasterConfigSynchronization(&htim1, &sMasterConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
 
-		sBreakDeadTimeConfig.OffStateRunMode = TIM_OSSR_DISABLE;
-		sBreakDeadTimeConfig.OffStateIDLEMode = TIM_OSSI_DISABLE;
-		sBreakDeadTimeConfig.LockLevel = TIM_LOCKLEVEL_OFF;
-		sBreakDeadTimeConfig.DeadTime = 0;
-		sBreakDeadTimeConfig.BreakState = TIM_BREAK_DISABLE;
-		sBreakDeadTimeConfig.BreakPolarity = TIM_BREAKPOLARITY_HIGH;
-		sBreakDeadTimeConfig.AutomaticOutput = TIM_AUTOMATICOUTPUT_DISABLE;
-		HAL_TIMEx_ConfigBreakDeadTime(&htim1, &sBreakDeadTimeConfig);
-	  /* PWM mode 2 = Clear on compare match */
-      /* PWM mode 1 = Set on compare match */
 		sConfigOC.Pulse = 2099; /* 25% duty cycle */
 		sConfigOC.OCMode = TIM_OCMODE_PWM1;
 		sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
@@ -138,14 +183,33 @@ void MX_TIM1_Init(void)
 		sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
 		sConfigOC.OCIdleState = TIM_OCIDLESTATE_RESET;
 		sConfigOC.OCNIdleState = TIM_OCNIDLESTATE_RESET;
-		HAL_TIM_PWM_ConfigChannel(&htim1,&sConfigOC,TIM_CHANNEL_1);
-		HAL_TIM_PWM_ConfigChannel(&htim1,&sConfigOC,TIM_CHANNEL_2);   
+  if (HAL_TIM_PWM_ConfigChannel(&htim1, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  if (HAL_TIM_PWM_ConfigChannel(&htim1, &sConfigOC, TIM_CHANNEL_2) != HAL_OK)
+  {
+    Error_Handler();
+  }
+		sBreakDeadTimeConfig.OffStateRunMode = TIM_OSSR_DISABLE;
+		sBreakDeadTimeConfig.OffStateIDLEMode = TIM_OSSI_DISABLE;
+		sBreakDeadTimeConfig.LockLevel = TIM_LOCKLEVEL_OFF;
+		sBreakDeadTimeConfig.DeadTime = 0;
+		sBreakDeadTimeConfig.BreakState = TIM_BREAK_DISABLE;
+		sBreakDeadTimeConfig.BreakPolarity = TIM_BREAKPOLARITY_HIGH;
+		sBreakDeadTimeConfig.AutomaticOutput = TIM_AUTOMATICOUTPUT_DISABLE;
+  if (HAL_TIMEx_ConfigBreakDeadTime(&htim1, &sBreakDeadTimeConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  HAL_TIM_MspPostInit(&htim1);
+
 
 }
 
 
 /* TIM3 init function */
-void MX_TIM3_Init(void)
+static void MX_TIM3_Init(void)
 {
 	/*PWM period  = 20 ms = 50 hz*/
 	/*
@@ -182,16 +246,26 @@ void MX_TIM3_Init(void)
   htim3.Init.CounterMode = TIM_COUNTERMODE_UP;
   htim3.Init.Period = 1679;
   htim3.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
-  HAL_TIM_PWM_Init(&htim3);
+  if (HAL_TIM_PWM_Init(&htim3) != HAL_OK)
+  {
+    Error_Handler();
+  }
 
   sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
   sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
-  HAL_TIMEx_MasterConfigSynchronization(&htim3, &sMasterConfig);
+  if (HAL_TIMEx_MasterConfigSynchronization(&htim3, &sMasterConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
 
   sConfigOC.OCMode = TIM_OCMODE_PWM1;
   sConfigOC.Pulse = 0;
   sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
   sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
-  HAL_TIM_PWM_ConfigChannel(&htim3, &sConfigOC, TIM_CHANNEL_1);
+  if (HAL_TIM_PWM_ConfigChannel(&htim3, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
+  {
+    Error_Handler();
+  }
 
+  HAL_TIM_MspPostInit(&htim3);
 }

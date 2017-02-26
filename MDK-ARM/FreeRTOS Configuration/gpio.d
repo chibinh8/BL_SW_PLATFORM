@@ -2,7 +2,7 @@ freertos configuration/\gpio.o: ..\BL_Driver\gpio.c
 freertos configuration/\gpio.o: ..\BL_Driver\gpio.h
 freertos configuration/\gpio.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h
 freertos configuration/\gpio.o: ../Inc/stm32f4xx_hal_conf.h
-freertos configuration/\gpio.o: ../Inc/mxconstants.h
+freertos configuration/\gpio.o: ../Inc/main.h
 freertos configuration/\gpio.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc.h
 freertos configuration/\gpio.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h
 freertos configuration/\gpio.o: ../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f4xx.h
@@ -10,6 +10,7 @@ freertos configuration/\gpio.o: ../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm
 freertos configuration/\gpio.o: ../Drivers/CMSIS/Include/core_cm4.h
 freertos configuration/\gpio.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
 freertos configuration/\gpio.o: ../Drivers/CMSIS/Include/core_cmInstr.h
+freertos configuration/\gpio.o: ../Drivers/CMSIS/Include/cmsis_armcc.h
 freertos configuration/\gpio.o: ../Drivers/CMSIS/Include/core_cmFunc.h
 freertos configuration/\gpio.o: ../Drivers/CMSIS/Include/core_cmSimd.h
 freertos configuration/\gpio.o: ../Drivers/CMSIS/Device/ST/STM32F4xx/Include/system_stm32f4xx.h

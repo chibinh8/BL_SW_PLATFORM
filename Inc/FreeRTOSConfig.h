@@ -1,5 +1,5 @@
 /*
-    FreeRTOS V8.2.1 - Copyright (C) 2015 Real Time Engineers Ltd.
+    FreeRTOS V8.2.3 - Copyright (C) 2015 Real Time Engineers Ltd.
     All rights reserved
 
     VISIT http://www.FreeRTOS.org TO ENSURE YOU ARE USING THE LATEST VERSION.
@@ -89,7 +89,7 @@
 /* Ensure stdint is only used by the compiler, and not the assembler. */
 #if defined(__ICCARM__) || defined(__CC_ARM) || defined(__GNUC__)
     #include <stdint.h>
-    #include "mxconstants.h" 
+    #include "main.h" 
     extern uint32_t SystemCoreClock;
 #endif
 
@@ -107,8 +107,6 @@
 #define configUSE_MUTEXES                        1
 #define configQUEUE_REGISTRY_SIZE                8
 #define configCHECK_FOR_STACK_OVERFLOW           1
-#define configUSE_RECURSIVE_MUTEXES              1
-#define configUSE_COUNTING_SEMAPHORES            1
 
 /* Co-routine definitions. */
 #define configUSE_CO_ROUTINES                    0

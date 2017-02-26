@@ -33,6 +33,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include  "BL_SystemConfig.h"
 
+
 /* USER CODE BEGIN Includes */
 
 /* USER CODE END Includes */
@@ -113,16 +114,16 @@ int main(void)
 
   /* Create the thread(s) */
   /* definition and creation of defaultTask */
-  osThreadDef(defaultTask, StartDefaultTask, osPriorityNormal, 0, 50);
-  defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
+//  osThreadDef(defaultTask, StartDefaultTask, osPriorityNormal, 0, 50);
+//  defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
-	 osThreadDef(UserTask, StartUserTask, osPriorityAboveNormal, 0, 128);//128*4 = 512 byte
+	 osThreadDef(UserTask, StartUserTask, osPriorityAboveNormal, 1, 128);//128*4 = 512 byte
    defaultTaskHandle = osThreadCreate(osThread(UserTask), NULL);	 
 	 
-	 osThreadDef(RT10msTask, Start10msTask, osPriorityAboveNormal, 1, 128);
-   defaultTaskHandle = osThreadCreate(osThread(RT10msTask), NULL);
+//	 osThreadDef(RT10msTask, Start10msTask, osPriorityAboveNormal, 1, 128);
+//   defaultTaskHandle = osThreadCreate(osThread(RT10msTask), NULL);
   /* USER CODE END RTOS_THREADS */
 
   /* USER CODE BEGIN RTOS_QUEUES */
@@ -154,15 +155,15 @@ void StartUserTask(void const * argument)
 {
 	uint16_t dutyrcservo =0;
   /* USER CODE BEGIN 5 */
-		if(E_OK==InitESp8266())
-			HAL_GPIO_WritePin(GPIOD, GPIO_PIN_14, GPIO_PIN_RESET);
-		else
-			HAL_GPIO_WritePin(GPIOD, GPIO_PIN_14, GPIO_PIN_SET);
+
 		InitRCServo();
   /* Infinite loop */
 		for(;;)
 		{ 
-			ProcessDiagserviceCyclicMain();
+			//ProcessDiagserviceCyclicMain();
+			if(E_OK==InitESp8266())
+			  HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_14;
+
 			osDelay(1000);
 		}
 }

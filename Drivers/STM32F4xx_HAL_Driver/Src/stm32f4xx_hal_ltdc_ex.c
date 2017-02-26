@@ -2,13 +2,13 @@
   ******************************************************************************
   * @file    stm32f4xx_hal_ltdc_ex.c
   * @author  MCD Application Team
-  * @version V1.4.1
-  * @date    09-October-2015
+  * @version V1.6.0
+  * @date    04-November-2016
   * @brief   LTDC Extension HAL module driver.
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; COPYRIGHT(c) 2015 STMicroelectronics</center></h2>
+  * <h2><center>&copy; COPYRIGHT(c) 2016 STMicroelectronics</center></h2>
   *
   * Redistribution and use in source and binary forms, with or without modification,
   * are permitted provided that the following conditions are met:
@@ -87,15 +87,13 @@ HAL_StatusTypeDef HAL_LTDC_StructInitFromVideoConfig(LTDC_HandleTypeDef* hltdc, 
 {
   /* Retrieve signal polarities from DSI */
   
-  /* The following polarities are inverted:
-                     LTDC_DEPOLARITY_AL <-> LTDC_DEPOLARITY_AH
-	                   LTDC_VSPOLARITY_AL <-> LTDC_VSPOLARITY_AH
-	                   LTDC_HSPOLARITY_AL <-> LTDC_HSPOLARITY_AH)*/
+  /* The following polarity is inverted:
+                     LTDC_DEPOLARITY_AL <-> LTDC_DEPOLARITY_AH */
   
   /* Note 1 : Code in line w/ Current LTDC specification */
   hltdc->Init.DEPolarity = (VidCfg->DEPolarity == DSI_DATA_ENABLE_ACTIVE_HIGH) ? LTDC_DEPOLARITY_AL : LTDC_DEPOLARITY_AH;
-  hltdc->Init.VSPolarity = (VidCfg->VSPolarity == DSI_VSYNC_ACTIVE_HIGH) ? LTDC_VSPOLARITY_AL : LTDC_VSPOLARITY_AH;
-  hltdc->Init.HSPolarity = (VidCfg->HSPolarity == DSI_HSYNC_ACTIVE_HIGH) ? LTDC_HSPOLARITY_AL : LTDC_HSPOLARITY_AH;
+  hltdc->Init.VSPolarity = (VidCfg->VSPolarity == DSI_VSYNC_ACTIVE_HIGH) ? LTDC_VSPOLARITY_AH : LTDC_VSPOLARITY_AL;
+  hltdc->Init.HSPolarity = (VidCfg->HSPolarity == DSI_HSYNC_ACTIVE_HIGH) ? LTDC_HSPOLARITY_AH : LTDC_HSPOLARITY_AL;
 
   /* Note 2: Code to be used in case LTDC polarities inversion updated in the specification */
   /* hltdc->Init.DEPolarity = VidCfg->DEPolarity << 29;
@@ -103,10 +101,10 @@ HAL_StatusTypeDef HAL_LTDC_StructInitFromVideoConfig(LTDC_HandleTypeDef* hltdc, 
      hltdc->Init.HSPolarity = VidCfg->HSPolarity << 29; */
     
   /* Retrieve vertical timing parameters from DSI */
-  hltdc->Init.VerticalSync       = VidCfg->VerticalSyncActive - 1;
-  hltdc->Init.AccumulatedVBP     = VidCfg->VerticalSyncActive + VidCfg->VerticalBackPorch - 1;
-  hltdc->Init.AccumulatedActiveH = VidCfg->VerticalSyncActive + VidCfg->VerticalBackPorch + VidCfg->VerticalActive - 1;
-  hltdc->Init.TotalHeigh         = VidCfg->VerticalSyncActive + VidCfg->VerticalBackPorch + VidCfg->VerticalActive + VidCfg->VerticalFrontPorch - 1;
+  hltdc->Init.VerticalSync       = VidCfg->VerticalSyncActive - 1U;
+  hltdc->Init.AccumulatedVBP     = VidCfg->VerticalSyncActive + VidCfg->VerticalBackPorch - 1U;
+  hltdc->Init.AccumulatedActiveH = VidCfg->VerticalSyncActive + VidCfg->VerticalBackPorch + VidCfg->VerticalActive - 1U;
+  hltdc->Init.TotalHeigh         = VidCfg->VerticalSyncActive + VidCfg->VerticalBackPorch + VidCfg->VerticalActive + VidCfg->VerticalFrontPorch - 1U;
   
   return HAL_OK;
 }

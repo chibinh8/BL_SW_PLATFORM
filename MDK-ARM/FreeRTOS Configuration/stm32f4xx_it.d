@@ -1,7 +1,7 @@
 freertos configuration/\stm32f4xx_it.o: ../Src/stm32f4xx_it.c
 freertos configuration/\stm32f4xx_it.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h
 freertos configuration/\stm32f4xx_it.o: ../Inc/stm32f4xx_hal_conf.h
-freertos configuration/\stm32f4xx_it.o: ../Inc/mxconstants.h
+freertos configuration/\stm32f4xx_it.o: ../Inc/main.h
 freertos configuration/\stm32f4xx_it.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc.h
 freertos configuration/\stm32f4xx_it.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h
 freertos configuration/\stm32f4xx_it.o: ../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f4xx.h
@@ -9,6 +9,7 @@ freertos configuration/\stm32f4xx_it.o: ../Drivers/CMSIS/Device/ST/STM32F4xx/Inc
 freertos configuration/\stm32f4xx_it.o: ../Drivers/CMSIS/Include/core_cm4.h
 freertos configuration/\stm32f4xx_it.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
 freertos configuration/\stm32f4xx_it.o: ../Drivers/CMSIS/Include/core_cmInstr.h
+freertos configuration/\stm32f4xx_it.o: ../Drivers/CMSIS/Include/cmsis_armcc.h
 freertos configuration/\stm32f4xx_it.o: ../Drivers/CMSIS/Include/core_cmFunc.h
 freertos configuration/\stm32f4xx_it.o: ../Drivers/CMSIS/Include/core_cmSimd.h
 freertos configuration/\stm32f4xx_it.o: ../Drivers/CMSIS/Device/ST/STM32F4xx/Include/system_stm32f4xx.h
@@ -34,9 +35,9 @@ freertos configuration/\stm32f4xx_it.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm3
 freertos configuration/\stm32f4xx_it.o: ../Inc/stm32f4xx_it.h
 freertos configuration/\stm32f4xx_it.o: ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.h
 freertos configuration/\stm32f4xx_it.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
+freertos configuration/\stm32f4xx_it.o: ../Drivers/CMSIS/Include/core_cmFunc.h
 freertos configuration/\stm32f4xx_it.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h
 freertos configuration/\stm32f4xx_it.o: ../Inc/FreeRTOSConfig.h
-freertos configuration/\stm32f4xx_it.o: ../Inc/mxconstants.h
 freertos configuration/\stm32f4xx_it.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h
 freertos configuration/\stm32f4xx_it.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/portable.h
 freertos configuration/\stm32f4xx_it.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/deprecated_definitions.h

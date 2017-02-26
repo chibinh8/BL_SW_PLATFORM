@@ -3,7 +3,7 @@ freertos configuration/\port.o: ../Middlewares/Third_Party/FreeRTOS/Source/inclu
 freertos configuration/\port.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
 freertos configuration/\port.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
 freertos configuration/\port.o: ../Inc/FreeRTOSConfig.h
-freertos configuration/\port.o: ../Inc/mxconstants.h
+freertos configuration/\port.o: ../Inc/main.h
 freertos configuration/\port.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h
 freertos configuration/\port.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/portable.h
 freertos configuration/\port.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/deprecated_definitions.h

@@ -4,12 +4,12 @@
 ARM Macro Assembler    Page 1 
 
 
-    1 00000000         ;******************** (C) COPYRIGHT 2015 STMicroelectron
+    1 00000000         ;******************** (C) COPYRIGHT 2016 STMicroelectron
                        ics ********************
     2 00000000         ;* File Name          : startup_stm32f407xx.s
     3 00000000         ;* Author             : MCD Application Team
-    4 00000000         ;* Version            : V2.4.1
-    5 00000000         ;* Date               : 09-October-2015
+    4 00000000         ;* Version            : V2.6.0
+    5 00000000         ;* Date               : 04-November-2016
     6 00000000         ;* Description        : STM32F407xx devices vector table
                         for MDK-ARM toolchain. 
     7 00000000         ;*                      This module performs:
@@ -870,13 +870,13 @@ ARM Macro Assembler    Page 14
               00000000 
 Command Line: --debug --xref --diag_suppress=9931 --cpu=Cortex-M4.fp --apcs=int
 erwork --depend="freertos configuration/\startup_stm32f407xx.d" -o"freertos con
-figuration/\startup_stm32f407xx.o" -I..\Inc -ID:\EMBEDDED\PROJECTS\mBed\BCR\MDK
--ARM\RTE -IC:\Keil_v5\ARM\PACK\ARM\CMSIS\4.5.0\CMSIS\Include -IC:\Keil_v5\ARM\P
-ACK\Keil\STM32F4xx_DFP\2.6.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include --predef
-ine="__EVAL SETA 1" --predefine="__MICROLIB SETA 1" --predefine="__UVISION_VERS
-ION SETA 517" --predefine="_RTE_ SETA 1" --predefine="STM32F407xx SETA 1" --lis
-t=startup_stm32f407xx.lst ../Drivers/CMSIS/Device/ST/STM32F4xx/Source/Templates
-/arm/startup_stm32f407xx.s
+figuration/\startup_stm32f407xx.o" -I..\Inc -ID:\EMBEDDED\PROJECTS\BCR\BCR\MDK-
+ARM\RTE -IC:\Keil_v5\ARM\PACK\ARM\CMSIS\4.5.0\CMSIS\Include -IC:\Keil_v5\ARM\PA
+CK\Keil\STM32F4xx_DFP\2.6.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include --predefi
+ne="__EVAL SETA 1" --predefine="__MICROLIB SETA 1" --predefine="__UVISION_VERSI
+ON SETA 517" --predefine="_RTE_ SETA 1" --predefine="STM32F407xx SETA 1" --list
+=startup_stm32f407xx.lst ../Drivers/CMSIS/Device/ST/STM32F4xx/Source/Templates/
+arm/startup_stm32f407xx.s
 
 
 

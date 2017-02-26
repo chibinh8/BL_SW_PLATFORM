@@ -26,8 +26,9 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart){
 	/*Once 1 charater is recieved, this callback function will be invoked*/
 		/*Indicate data received*/	
 	  if (huart->Instance == BL_UARTIncstance)	//current UART
-		{	if(Rx_data[0]=='O') HAL_GPIO_WritePin(GPIOD, GPIO_PIN_14, GPIO_PIN_SET);
-			if ((Rx_data[0]!=13)&&(Rx_data[0]!=10))	//if received data different from ascii 13 (enter)
+		{	
+
+			if ((Rx_data[0]!='\r')&&(Rx_data[0]!='\n'))	//if received data different from ascii 13 (enter)
 				{	
 					if(Rx_indx==(BL_BUFFSIZE-1)) Rx_indx=0; //reset buffer index in case lengh of input string over buffer
 					Rx_Buffer[Rx_indx++]=Rx_data[0];	//add data to Rx_Buffer
@@ -37,12 +38,15 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart){
 				Rx_indx=0;
 				IsRxcpltFlag_b=TRUE;//transfer complete, data is ready to read
 				}
+			 __HAL_UART_CLEAR_PEFLAG(&BL_UART);
+			 __HAL_UART_CLEAR_FEFLAG(&BL_UART);
+			 __HAL_UART_CLEAR_NEFLAG(&BL_UART);
 			 __HAL_UART_CLEAR_OREFLAG(&BL_UART); //clear overrun flag
 			 HAL_UART_Receive_IT(&BL_UART, (uint8_t*)Rx_data, 1);	//activate UART receive interrupt every time
 		}
 }
 
-uint8_t GetDataRXcomplete(UART_HandleTypeDef *huart, const char *outbuffer, uint8_t Readoption, uint8_t size){
+uint8_t GetDataRXcomplete(UART_HandleTypeDef *huart, char *outbuffer, uint8_t Readoption, uint8_t size){
 		uint8_t datarecev_b = FALSE;
 		if (huart->Instance == BL_UARTIncstance){	//current UART
 				if((Readoption==1)||((Readoption==0)&&(IsRxcpltFlag_b==TRUE))) //if data has been already available then update buffer

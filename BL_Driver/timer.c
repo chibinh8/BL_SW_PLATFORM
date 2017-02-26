@@ -1,4 +1,5 @@
 #include "timer.h"
+#include "dem.h"
 
 TIM_HandleTypeDef htim6;
 
@@ -12,11 +13,17 @@ void MX_TIM6_Init(void)
   htim6.Init.Prescaler = 168000;//1 ms
   htim6.Init.CounterMode = TIM_COUNTERMODE_UP;
   htim6.Init.Period = 499; //500 ms
-  HAL_TIM_Base_Init(&htim6);
+  if (HAL_TIM_Base_Init(&htim6) != HAL_OK)
+  {
+    Error_Handler();
+  }
 
   sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
   sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
-  HAL_TIMEx_MasterConfigSynchronization(&htim6, &sMasterConfig);
+  if (HAL_TIMEx_MasterConfigSynchronization(&htim6, &sMasterConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
 	HAL_TIM_Base_Start_IT(&htim6);
 
 }

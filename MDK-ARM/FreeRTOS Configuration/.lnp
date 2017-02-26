@@ -22,6 +22,7 @@
 "freertos configuration/\bl_systeminit.o"
 "freertos configuration/\pwm.o"
 "freertos configuration/\timer.o"
+"freertos configuration/\flash.o"
 "freertos configuration/\startup_stm32f407xx.o"
 "freertos configuration/\system_stm32f4xx.o"
 "freertos configuration/\cmsis_os.o"

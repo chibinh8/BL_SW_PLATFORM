@@ -5,7 +5,7 @@ freertos configuration/\tasks.o: ../Middlewares/Third_Party/FreeRTOS/Source/incl
 freertos configuration/\tasks.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
 freertos configuration/\tasks.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
 freertos configuration/\tasks.o: ../Inc/FreeRTOSConfig.h
-freertos configuration/\tasks.o: ../Inc/mxconstants.h
+freertos configuration/\tasks.o: ../Inc/main.h
 freertos configuration/\tasks.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h
 freertos configuration/\tasks.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/portable.h
 freertos configuration/\tasks.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/deprecated_definitions.h
