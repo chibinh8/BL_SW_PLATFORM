@@ -49,3 +49,31 @@ void SystemClock_Config(void)
   /* SysTick_IRQn interrupt configuration */
   HAL_NVIC_SetPriority(SysTick_IRQn, 15, 0);
 }
+
+void BL_SystemInit(void){
+	  /* MCU Configuration----------------------------------------------------------*/
+
+  /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
+  HAL_Init();
+
+  /* Configure the system clock */
+  SystemClock_Config();
+
+  /* Initialize all configured peripherals */
+  MX_GPIO_Init();
+	/*ADC Init*/
+	BL_ADCInit();
+	/*UART Init*/
+	#ifdef BL_TIM6
+  MX_TIM6_Init();
+	#endif
+  MX_USART_UART_Init();
+	
+	InitPwm2Motors();
+  /* USER CODE BEGIN 2 */ 
+	InitRCServo();	
+	if(E_OK==InitESp8266())
+			HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_14);
+  /* USER CODE END 2 */
+	
+}

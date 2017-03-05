@@ -10,8 +10,8 @@
 #define BL_UART huart2
 #define BL_UARTIncstance   USART2
 #define BL_UARTIRQFuncHandler USART2_IRQHandler
-#define BL_BUFFSIZE 10
-#define BAUDRATE  9600
+#define BL_BUFFSIZE 50
+#define BAUDRATE  115200
 
 void ClearRxBuffer(void);
 void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart);

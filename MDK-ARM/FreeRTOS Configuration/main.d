@@ -55,9 +55,16 @@ freertos configuration/\main.o: ../BL_Driver/BL_Define.h
 freertos configuration/\main.o: ../BL_Driver/uart.h
 freertos configuration/\main.o: ../BL_Driver/gpio.h
 freertos configuration/\main.o: ../BL_Driver/BL_SystemInit.h
+freertos configuration/\main.o: ../BL_Driver/BL_SystemConfig.h
+freertos configuration/\main.o: ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.h
+freertos configuration/\main.o: ../Drivers/CMSIS/Include/core_cmFunc.h
+freertos configuration/\main.o: ../BL_Driver/uart.h
+freertos configuration/\main.o: ../BL_Driver/BL_SystemInit.h
 freertos configuration/\main.o: ../BL_Driver/pwm.h
 freertos configuration/\main.o: ../BL_Driver/timer.h
 freertos configuration/\main.o: ../BL_Middlewares/DiagCom.h
 freertos configuration/\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
+freertos configuration/\main.o: ../BL_Driver/esp8266.h
+freertos configuration/\main.o: ../BL_Middlewares/dem.h
 freertos configuration/\main.o: ../BL_Driver/esp8266.h
 freertos configuration/\main.o: ../BL_Middlewares/dem.h

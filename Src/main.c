@@ -67,38 +67,19 @@ void Start10msTask(void const * argument);
 /* USER CODE BEGIN 0 */
  extern UART_HandleTypeDef BL_UART;
  extern ADC_HandleTypeDef hadc1;
- extern TIM_HandleTypeDef htim6;
+
 
 /* USER CODE END 0 */
 
 int main(void)
 {
 
-  /* USER CODE BEGIN 1 */
-
+  /* USER CODE BEGIN 1 */	
+	/*system initialization*/
+   BL_SystemInit();	
+	
   /* USER CODE END 1 */
 
-  /* MCU Configuration----------------------------------------------------------*/
-
-  /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
-  HAL_Init();
-
-  /* Configure the system clock */
-  SystemClock_Config();
-
-  /* Initialize all configured peripherals */
-  MX_GPIO_Init();
-	/*ADC Init*/
-	BL_ADCInit();
-	/*UART Init*/
-	#ifdef BL_TIM6
-  MX_TIM6_Init();
-	#endif
-  MX_USART_UART_Init();
-	InitPwm2Motors();
-  /* USER CODE BEGIN 2 */ 
-
-  /* USER CODE END 2 */
 
   /* USER CODE BEGIN RTOS_MUTEX */
   /* add mutexes, ... */
@@ -114,16 +95,16 @@ int main(void)
 
   /* Create the thread(s) */
   /* definition and creation of defaultTask */
-//  osThreadDef(defaultTask, StartDefaultTask, osPriorityNormal, 0, 50);
-//  defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
+  osThreadDef(defaultTask, StartDefaultTask, osPriorityNormal, 0, 50);
+  defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
 	 osThreadDef(UserTask, StartUserTask, osPriorityAboveNormal, 1, 128);//128*4 = 512 byte
    defaultTaskHandle = osThreadCreate(osThread(UserTask), NULL);	 
 	 
-//	 osThreadDef(RT10msTask, Start10msTask, osPriorityAboveNormal, 1, 128);
-//   defaultTaskHandle = osThreadCreate(osThread(RT10msTask), NULL);
+	 osThreadDef(RT10msTask, Start10msTask, osPriorityAboveNormal, 1, 128);
+   defaultTaskHandle = osThreadCreate(osThread(RT10msTask), NULL);
   /* USER CODE END RTOS_THREADS */
 
   /* USER CODE BEGIN RTOS_QUEUES */
@@ -153,17 +134,13 @@ int main(void)
 
 void StartUserTask(void const * argument)
 {
-	uint16_t dutyrcservo =0;
   /* USER CODE BEGIN 5 */
-
-		InitRCServo();
+	
+	/* USER CODE END 5 */
   /* Infinite loop */
 		for(;;)
 		{ 
-			//ProcessDiagserviceCyclicMain();
-			if(E_OK==InitESp8266())
-			  HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_14;
-
+			ProcessDiagserviceCyclicMain();			
 			osDelay(1000);
 		}
 }
