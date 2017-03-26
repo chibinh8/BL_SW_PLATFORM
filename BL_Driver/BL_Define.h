@@ -1,13 +1,20 @@
 #ifndef BL_DEFINE_H
 #define BL_DEFINE_H
+
 #ifndef STM32F4XX_HAL
 #define STM32F4XX_HAL
 #include "stm32f4xx_hal.h"
 #endif 
- 
-#define TRUE (1!=0)
-#define FALSE (0!=0)
 
+typedef enum{
+	
+	TRUE =0,
+	FALSE =1
+}BOOL;
+
+#define  BL_BUFFSIZE   50
+#define  ESPREADBUFF   50
+#define  ALARMBUFF		 ESPREADBUFF	
 
 #define NumofSampling 8
 #define NumOfSensor1 8

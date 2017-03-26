@@ -5,10 +5,7 @@
 #include "adc.h"
 #include "cmsis_os.h" 
 
-#ifndef STM32F4XX_HAL
-#define STM32F4XX_HAL
-#include "stm32f4xx_hal.h"
-#endif 
+
 
 #define DAREADBUFFER  (uint8_t)(BL_BUFFSIZE/10)
 extern ADCMode ADCSensorRunmode;
@@ -196,4 +193,8 @@ uint8_t LearnSensorThresRequest(char* response,const DiagCommand_typedef Outcomm
 	bl_adc_Calibstat_u8 = Outcommand.DID; // set calib state as DID input
 	taskEXIT_CRITICAL();
 	return 0;
+}
+
+uint8_t CopyRXDataESPClbkDiag(char* RXbuffer){
+	;
 }

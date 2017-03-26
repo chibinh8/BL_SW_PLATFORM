@@ -10,7 +10,7 @@
 #define BL_UART huart2
 #define BL_UARTIncstance   USART2
 #define BL_UARTIRQFuncHandler USART2_IRQHandler
-#define BL_BUFFSIZE 50
+
 #define BAUDRATE  115200
 
 void ClearRxBuffer(void);
@@ -34,7 +34,7 @@ uint8_t GetDataRXcomplete(UART_HandleTypeDef *huart, char *outbuffer, uint8_t Re
   * @param  None
   * @retval None
   */
-	
+
 #endif
 	
 	

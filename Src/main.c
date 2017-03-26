@@ -139,9 +139,9 @@ void StartUserTask(void const * argument)
 	/* USER CODE END 5 */
   /* Infinite loop */
 		for(;;)
-		{ 
+		{  ESPOperationCyclic();
 			ProcessDiagserviceCyclicMain();			
-			osDelay(1000);
+			osDelay(100);
 		}
 }
 	/* StartDefaultTask function */
