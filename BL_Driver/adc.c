@@ -18,7 +18,7 @@ uint16_t ringbuff[NumofSensor][NumofSampling] = {0};
 uint16_t FilteredSensorVal[NumofSensor]={0};
 ADCMode ADCSensorRunmode = CYCLIC;
 
-static uint8_t IsFilterDone = FALSE;
+static BOOL IsFilterDone = FALSE;
 static uint16_t ADCSensorBlackUpperThres[NumofSensor] = {0};
 static uint16_t ADCSensorWhiteLowerThres[NumofSensor] = {0};
 
@@ -189,7 +189,7 @@ void ReadAllRawSensorfromLine(void){
 
 /*public API to get final val for all sensor and reading status*/
 
-uint8_t ReadAllFinalSensorfromLine(uint16_t *AllsensorFinalVal){
+BOOL ReadAllFinalSensorfromLine(uint16_t *AllsensorFinalVal){
 	
 	if(IsFilterDone==TRUE) {
 		memcpy(AllsensorFinalVal, FilteredSensorVal, NumofSensor*2);
@@ -205,7 +205,7 @@ WHITE --> if digital input is lower or equal to it's lower threshold
 Note: Threshold is calibrated value which is stored in flalsh memory before.
 */
 
-uint8_t ReadStatusofAllsensor(uint8_t * OutStatusSS){
+BOOL ReadStatusofAllsensor(uint8_t * OutStatusSS){
 	
 	if(IsFilterDone==TRUE) {
 		for(int i=0; i<NumofSensor; i++){

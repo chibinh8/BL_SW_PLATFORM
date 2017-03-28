@@ -5,6 +5,9 @@
 #include "cmsis_os.h" 
 #include "dem.h"
 
+#define ESPErrorMaxcnt 20
+
+
 extern UART_HandleTypeDef BL_UART;
 static char Rx_Buffer_ESP[ESPREADBUFF];
 
@@ -13,10 +16,20 @@ static uint8_t IsReceivedDatafromESP(char *Rx_Buffer_c);
 uint8_t GetRawDatafromESP(void);
 
 extern uint8_t (*CopyRXDataESPClbk[]) (char* RXbuffer);
+
+void HardrestESP(void){
+	
+	HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12,GPIO_PIN_RESET);
+	HAL_Delay(200);
+	HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12,GPIO_PIN_SET);
+	
+}
+
 uint8_t ESPGeneralState_u8 = 1;
 
 uint8_t InitESp8266(void){
-
+	
+	HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12,GPIO_PIN_SET);
 	memset(Rx_Buffer_ESP,0,ESPREADBUFF);
 	ClearRxBuffer();
 	printf("AT\r\n");
@@ -42,8 +55,10 @@ uint8_t InitESp8266(void){
 	
 }
 
+static uint32_t timecurrCyc_u32 = 0;
 
 void ESPOperationCyclic(void){
+	
 	switch(ESPGeneralState_u8){		
 		case 0: //idle
 			break;
@@ -51,13 +66,26 @@ void ESPOperationCyclic(void){
 		 if(E_OK==InitESp8266()){
 			 ESPGeneralState_u8 = 2;
 			 HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_14);
-		 }
+			 GetCurrentTimestamp(&timecurrCyc_u32);
+		  } 
+		 		 
 			break;
 		case 2:
 		//Normal communication
+		HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_13);	
 		(void)GetRawDatafromESP();
-		
+			if((CheckTimestampElapsed(timecurrCyc_u32, (uint32_t)1000))==TRUE){
+					ESPGeneralState_u8 = 3;
+					GetCurrentTimestamp(&timecurrCyc_u32);
+			}
 			break;
+		case 3: 			
+			
+			if((CheckTimestampElapsed(timecurrCyc_u32, (uint32_t)3500)==TRUE)||(RecheckESPServer()==E_OK)){
+					ESPGeneralState_u8 = 2;
+					GetCurrentTimestamp(&timecurrCyc_u32);
+			}
+		
 		default:
 			break;
 	}
@@ -91,44 +119,62 @@ static uint8_t RecheckESPServerWithDelay(void){
 	return E_NOT_OK; 
 }
 
+static uint8_t t_recheckState_en = STATE1;
+static uint8_t ESPErrorcnt_u8 = 0;	
+
 static uint8_t RecheckESPServer(void){
 	
 	static uint16_t t_delay_u16 = 0;
-	static Recheckstate_en t_recheckState_en = STATE1;
+
 	static uint32_t timecurr_u32 = 0;
-	static Recheckstate_en t_LastRecheckState_en = STATE1;
+	static uint8_t t_LastRecheckState_en = STATE1;
 	
 	switch(t_recheckState_en){	
 		
 		case STATE1: 
 			t_LastRecheckState_en  = t_recheckState_en;
 			ClearRxBuffer();//clear buffer
+			memset(Rx_Buffer_ESP,0,ESPREADBUFF);
 			//TCP/UDP Connections
 			printf("AT+CIPMUX=1\r\n");	
 	    //waiting for respond OK from module		
 			t_recheckState_en = WAITING;
-			t_delay_u16 = 300u;
+			t_delay_u16 = 1000u;
 			GetCurrentTimestamp(&timecurr_u32);
 		  break;
 				
 		case WAITING:		
 			
-			if((CheckTimestampElapsed(timecurr_u32, (uint32_t)t_delay_u16))&&(TRUE==GetDataRXcomplete(&BL_UART,Rx_Buffer_ESP,0,ESPREADBUFF)) \
+			if((CheckTimestampElapsed(timecurr_u32, (uint32_t)t_delay_u16)==TRUE)&&(TRUE==GetDataRXcomplete(&BL_UART,Rx_Buffer_ESP,0,ESPREADBUFF)) \
 				&&((Rx_Buffer_ESP[0]=='O')&&(Rx_Buffer_ESP[1]=='K')))
 				{			GetCurrentTimestamp(&timecurr_u32);
-					    t_recheckState_en = (Recheckstate_en)((uint8_t)t_LastRecheckState_en+1);
+					    t_recheckState_en = ((uint8_t)t_LastRecheckState_en+1);
 							t_delay_u16 = 1000u;
 							ClearRxBuffer();//clear buffer
+							memset(Rx_Buffer_ESP,0,ESPREADBUFF);
 				}
-			else{
+			else if(CheckTimestampElapsed(timecurr_u32, (uint32_t)t_delay_u16)==TRUE){		/*retry send request*/
+							t_recheckState_en = t_LastRecheckState_en;
+							ESPErrorcnt_u8++;
+							if(ESPErrorcnt_u8>ESPErrorMaxcnt){
+								ESPErrorcnt_u8=0;
+								HardrestESP();
+								HAL_NVIC_SystemReset();
+							}
+				
 							return E_NOT_OK;
-				}				
+				}	
+			else{
+				
+					return E_NOT_OK;
+			}
 		  break;			
 				
 		case STATE2:
 			
 			t_LastRecheckState_en  = t_recheckState_en;		
 			ClearRxBuffer();//clear buffer
+			memset(Rx_Buffer_ESP,0,ESPREADBUFF);
 			//Set as server
 			printf("AT+CIPSERVER=1,150\r\n");
 	    //waiting for respond OK from module		

@@ -2,7 +2,7 @@
 #include "string.h"
 
 UART_HandleTypeDef BL_UART;
-static uint8_t IsRxcpltFlag_b = FALSE ;
+static BOOL IsRxcpltFlag_b = FALSE ;
 static char Rx_data[2], Rx_Buffer[BL_BUFFSIZE];
 uint8_t Rx_indx =0;
 
@@ -42,12 +42,13 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart){
 			 __HAL_UART_CLEAR_FEFLAG(&BL_UART);
 			 __HAL_UART_CLEAR_NEFLAG(&BL_UART);
 			 __HAL_UART_CLEAR_OREFLAG(&BL_UART); //clear overrun flag
+			 __HAL_UART_CLEAR_IDLEFLAG(&BL_UART);
 			 HAL_UART_Receive_IT(&BL_UART, (uint8_t*)Rx_data, 1);	//activate UART receive interrupt every time
 		}
 }
 
-uint8_t GetDataRXcomplete(UART_HandleTypeDef *huart, char *outbuffer, uint8_t Readoption, uint8_t size){
-		uint8_t datarecev_b = FALSE;
+BOOL GetDataRXcomplete(UART_HandleTypeDef *huart, char *outbuffer, uint8_t Readoption, uint8_t size){
+		BOOL datarecev_b = FALSE;
 		if (huart->Instance == BL_UARTIncstance){	//current UART
 				if((Readoption==1)||((Readoption==0)&&(IsRxcpltFlag_b==TRUE))) //if data has been already available then update buffer
 				{ //if Readoption =1, read all incoming data else only read data if \r\n is detected

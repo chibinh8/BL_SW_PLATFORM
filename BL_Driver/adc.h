@@ -29,7 +29,7 @@ uint8_t ReadAllFinalSensorfromLine(uint16_t *AllsensorFinalVal);
 
 void ReadAllRawSensorfromLine(void);
 
-uint8_t ReadStatusofAllsensor(uint8_t * OutStatusSS);
+BOOL ReadStatusofAllsensor(uint8_t * OutStatusSS);
 
 void ADCSensorMaincyclic(void);
 

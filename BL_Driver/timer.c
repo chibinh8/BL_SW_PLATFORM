@@ -48,7 +48,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
 		HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_12);	
 }
 /*Timebased is 1 milisecond for 1 tick */
-inline uint8_t CheckTimestampElapsed(uint32_t timestart_u32, uint32_t period_u32){
+inline BOOL CheckTimestampElapsed(uint32_t timestart_u32, uint32_t period_u32){
 	return ((HAL_GetTick()-timestart_u32)>=period_u32)?TRUE:FALSE;
 }
 

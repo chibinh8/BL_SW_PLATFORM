@@ -8,8 +8,9 @@
 
 typedef enum{
 	
-	TRUE =0,
-	FALSE =1
+	FALSE =0,
+	TRUE = 1
+
 }BOOL;
 
 #define  BL_BUFFSIZE   50
@@ -29,5 +30,6 @@ typedef enum{
 	E_NOT_OK,	
 }retstate;
 #endif 
+
 #endif
 

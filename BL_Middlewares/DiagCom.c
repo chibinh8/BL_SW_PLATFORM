@@ -8,6 +8,7 @@
 
 
 #define DAREADBUFFER  (uint8_t)(BL_BUFFSIZE/10)
+
 extern ADCMode ADCSensorRunmode;
 
 typedef struct {	
@@ -89,7 +90,7 @@ Diagstate_en GetCommandfromQueue(DiagCommand_typedef *Outcommand){
 				characprocess_ptr++;
 			}
 			characprocess_ptr = &Rx_Buffer_t[0];
-			if(length<MINSIZECOMMAND) return FALSE;
+			if(length<MINSIZECOMMAND) return RAWCHECK_NOTOK;
 			while((*characprocess_ptr)==' ') characprocess_ptr++; //find the fisrt position different from space
 			if((*characprocess_ptr=='D')&&(*(characprocess_ptr+1)=='A')){
 				/*next thing is to check and get other elements of DiagCommand_typedef: length, serviceID, DID*/
@@ -196,5 +197,5 @@ uint8_t LearnSensorThresRequest(char* response,const DiagCommand_typedef Outcomm
 }
 
 uint8_t CopyRXDataESPClbkDiag(char* RXbuffer){
-	;
+	return E_OK;
 }

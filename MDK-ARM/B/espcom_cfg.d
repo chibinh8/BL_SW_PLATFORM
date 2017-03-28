@@ -34,3 +34,4 @@ b\espcom_cfg.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h
 b\espcom_cfg.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h
 b\espcom_cfg.o: ../BL_App_SDAlarm/bl_app_sdalarm.h
 b\espcom_cfg.o: ../BL_Driver/BL_Define.h
+b\espcom_cfg.o: ../BL_Middlewares/DiagCom.h

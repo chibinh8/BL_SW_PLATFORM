@@ -19,7 +19,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart);
 void USART2_IRQHandler(void);
 void MX_USART_UART_Init(void);
 
-uint8_t GetDataRXcomplete(UART_HandleTypeDef *huart, char *outbuffer, uint8_t Readoption, uint8_t size);
+BOOL GetDataRXcomplete(UART_HandleTypeDef *huart, char *outbuffer, uint8_t Readoption, uint8_t size);
 
 #ifdef __GNUC__
   /* With GCC/RAISONANCE, small printf (option LD Linker->Libraries->Small printf

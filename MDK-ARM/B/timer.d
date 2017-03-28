@@ -1,5 +1,6 @@
 b\timer.o: ..\BL_Driver\timer.c
 b\timer.o: ..\BL_Driver\timer.h
+b\timer.o: ..\BL_Driver\BL_Define.h
 b\timer.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h
 b\timer.o: ../Inc/stm32f4xx_hal_conf.h
 b\timer.o: ../Inc/main.h
@@ -33,5 +34,4 @@ b\timer.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr_ex.h
 b\timer.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h
 b\timer.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h
 b\timer.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h
-b\timer.o: ..\BL_Driver\BL_Define.h
 b\timer.o: ../BL_Middlewares/dem.h
