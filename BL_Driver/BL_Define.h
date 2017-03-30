@@ -13,8 +13,8 @@ typedef enum{
 
 }BOOL;
 
-#define  BL_BUFFSIZE   50
-#define  ESPREADBUFF   50
+#define  BL_BUFFSIZE   25
+#define  ESPREADBUFF   25
 #define  ALARMBUFF		 ESPREADBUFF	
 
 #define NumofSampling 8

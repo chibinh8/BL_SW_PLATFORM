@@ -39,6 +39,7 @@
 "b\diagcom.o"
 "b\pid.o"
 "b\powermanager.o"
+"b\ecumodemanager.o"
 "b\stm32f4xx_hal_msp.o"
 "b\main.o"
 "b\stm32f4xx_it.o"

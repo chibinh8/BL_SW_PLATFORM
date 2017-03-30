@@ -27,16 +27,15 @@ Project File Date:  03/26/2017
 <h2>Output:</h2>
 *** Using Compiler 'V5.06 update 1 (build 61)', folder: 'C:\Keil_v5\ARM\ARMCC\Bin'
 Build target 'FreeRTOS Configuration'
-compiling esp8266.c...
-..\BL_Driver\esp8266.c(191): warning:  #111-D: statement is unreachable
-  				break;		
-..\BL_Driver\esp8266.c(96): warning:  #177-D: function "RecheckESPServerWithDelay" was declared but never referenced
-  static uint8_t RecheckESPServerWithDelay(void){
-..\BL_Driver\esp8266.c: 2 warnings, 0 errors
+compiling dem.c...
+..\BL_Middlewares\dem.c(37): warning:  #1-D: last line of file ends without a newline
+  #endif
+..\BL_Middlewares\dem.c: 1 warning, 0 errors
+compiling main.c...
 linking...
-Program Size: Code=16584 RO-data=728 RW-data=152 ZI-data=17288  
+Program Size: Code=16456 RO-data=728 RW-data=160 ZI-data=17240  
 FromELF: creating hex file...
-"B\freertos.axf" - 0 Error(s), 2 Warning(s).
+"B\freertos.axf" - 0 Error(s), 1 Warning(s).
 
 <h2>Software Packages used:</h2>
 
@@ -54,7 +53,7 @@ Package Vendor: ARM
 <h2>Collection of Component Files used:</h2>
 
    * Component: ARM::CMSIS:CORE:4.3.0
-Build Time Elapsed:  00:00:08
+Build Time Elapsed:  00:00:09
 </pre>
 </body>
 </html>

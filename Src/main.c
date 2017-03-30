@@ -44,8 +44,8 @@
 
 
 
-osThreadId defaultTaskHandle;
-
+osThreadId defaultTaskHandle, UserTaskTaskHandle, RT10msTaskHandle;
+				
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
 
@@ -101,10 +101,10 @@ int main(void)
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
 	 osThreadDef(UserTask, StartUserTask, osPriorityAboveNormal, 1, 128);//128*4 = 512 byte
-   defaultTaskHandle = osThreadCreate(osThread(UserTask), NULL);	 
+   UserTaskTaskHandle = osThreadCreate(osThread(UserTask), NULL);	 
 	 
-	 osThreadDef(RT10msTask, Start10msTask, osPriorityAboveNormal, 1, 128);
-   defaultTaskHandle = osThreadCreate(osThread(RT10msTask), NULL);
+	 osThreadDef(RT10msTask, Start10msTask, osPriorityAboveNormal, 1, 256);
+   RT10msTaskHandle = osThreadCreate(osThread(RT10msTask), NULL);
   /* USER CODE END RTOS_THREADS */
 
   /* USER CODE BEGIN RTOS_QUEUES */
@@ -142,7 +142,7 @@ void StartUserTask(void const * argument)
 		{  
 			ESPOperationCyclic();
 			ProcessDiagserviceCyclicMain();			
-			osDelay(100);
+			osDelay(50);
 		}
 }
 	/* StartDefaultTask function */
@@ -176,25 +176,7 @@ void StartDefaultTask(void const * argument)
   /* USER CODE END 5 */ 
 }
 
-#ifdef USE_FULL_ASSERT
 
-/**
-   * @brief Reports the name of the source file and the source line number
-   * where the assert_param error has occurred.
-   * @param file: pointer to the source file name
-   * @param line: assert_param error line source number
-   * @retval None
-   */
-void assert_failed(uint8_t* file, uint32_t line)
-{
-  /* USER CODE BEGIN 6 */
-  /* User can add his own implementation to report the file name and line number,
-    ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
-  /* USER CODE END 6 */
-
-}
-
-#endif
 
 /**
   * @}

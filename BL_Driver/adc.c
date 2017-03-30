@@ -145,13 +145,13 @@ void ReadSensor(volatile uint16_t* outsensorval, ADC_HandleTypeDef *hadc, uint8_
   sConfig.SamplingTime = ADC_SAMPLETIME_3CYCLES;	
   HAL_ADC_ConfigChannel(hadc, &sConfig);	
 	HAL_ADC_Start(hadc);
-	 if(HAL_ADC_PollForConversion(hadc,0xFF)==HAL_OK){
+	 if(HAL_ADC_PollForConversion(hadc,1)==HAL_OK){
 	   tempsensor = HAL_ADC_GetValue(hadc);
 		 
 	 }else{
 		 tempsensor = 0u;
 	 }
-		HAL_ADC_Stop(hadc);
+
 	 *outsensorval = (uint16_t)(tempsensor&0x0FFF);	 
 }
 
