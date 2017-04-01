@@ -972,6 +972,11 @@
               <FileType>1</FileType>
               <FilePath>..\BL_Middlewares\powermanager.c</FilePath>
             </File>
+            <File>
+              <FileName>ECUModeManager.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\BL_Middlewares\ECUModeManager.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

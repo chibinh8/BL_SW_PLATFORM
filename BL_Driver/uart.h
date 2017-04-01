@@ -18,6 +18,7 @@ void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart);
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart);
 void USART2_IRQHandler(void);
 void MX_USART_UART_Init(void);
+void ResetUARTESP(void);
 
 BOOL GetDataRXcomplete(UART_HandleTypeDef *huart, char *outbuffer, uint8_t Readoption, uint8_t size);
 

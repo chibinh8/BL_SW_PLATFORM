@@ -77,6 +77,14 @@ void USART2_IRQHandler(void)
 	
   /* USER CODE END USART2_IRQn 1 */
 }	
+
+void ResetUARTESP(void){
+	
+	HAL_UART_DeInit(&BL_UART);
+	HAL_UART_Init(&BL_UART);
+	
+}
+
 #ifdef DEBUG
 void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart){
 	

@@ -4,8 +4,9 @@
 #include "timer.h"
 #include "cmsis_os.h" 
 #include "dem.h"
+#include "ECUModeManager.h"
 
-#define ESPErrorMaxcnt 5
+#define ESPErrorMaxcnt 10
 #define GPIOPINESPRESET GPIO_PIN_12
 
 extern UART_HandleTypeDef BL_UART;
@@ -16,6 +17,7 @@ static uint8_t IsReceivedDatafromESP(char *Rx_Buffer_c);
 uint8_t GetRawDatafromESP(void);
 
 extern uint8_t (*CopyRXDataESPClbk[]) (char* RXbuffer);
+uint8_t SendMessagetoESP(char *data);
 
 void HardResetESP(void){
 	
@@ -41,6 +43,7 @@ void DisableESPHardware(void){
 uint8_t ESPGeneralState_u8 = 1;
 
 uint8_t InitESp8266(void){	
+	
 	EnableESP();
 	memset(Rx_Buffer_ESP,0,ESPREADBUFF);
 	ClearRxBuffer();
@@ -68,19 +71,25 @@ uint8_t InitESp8266(void){
 }
 
 static uint32_t timecurrCyc_u32 = 0;
+static uint16_t InitErrorCnt_u16 =0;
 
 void ESPOperationCyclic(void){
 	
 	switch(ESPGeneralState_u8){		
 		case 0: //idle
+			 GetCurrentTimestamp(&timecurrCyc_u32);
+			 ESPGeneralState_u8 = 1;
 			break;
 		case 1: //init
-		 if(E_OK==InitESp8266()){
+		  if(E_OK==InitESp8266()){
 			 ESPGeneralState_u8 = 2;
 			 HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_14);
 			 GetCurrentTimestamp(&timecurrCyc_u32);
-		  } 
-		 		 
+		  }else if((CheckTimestampElapsed(timecurrCyc_u32, (uint32_t)10000))==TRUE){
+					HardResetESP();
+					ESPGeneralState_u8 = 0;
+			}
+
 			break;
 		case 2:
 		//Normal communication
@@ -148,7 +157,8 @@ static uint8_t RecheckESPServer(void){
 			ClearRxBuffer();//clear buffer
 			memset(Rx_Buffer_ESP,0,ESPREADBUFF);
 			//TCP/UDP Connections
-			printf("AT+CIPMUX=1\r\n");	
+			//printf("AT+CIPMUX=1\r\n");	
+			printf("AT\r\n");
 	    //waiting for respond OK from module		
 			t_recheckState_en = WAITING;
 			t_delay_u16 = 100u;
@@ -156,29 +166,34 @@ static uint8_t RecheckESPServer(void){
 		  break;
 				
 		case WAITING:		
-			
-			if((CheckTimestampElapsed(timecurr_u32, (uint32_t)t_delay_u16)==TRUE)&&(TRUE==GetDataRXcomplete(&BL_UART,Rx_Buffer_ESP,0,ESPREADBUFF)) \
-				&&((Rx_Buffer_ESP[0]=='O')&&(Rx_Buffer_ESP[1]=='K')))
-				{			GetCurrentTimestamp(&timecurr_u32);
-					    t_recheckState_en = ((uint8_t)t_LastRecheckState_en+1);
-							t_delay_u16 = 100u;
-							ClearRxBuffer();//clear buffer
-							memset(Rx_Buffer_ESP,0,ESPREADBUFF);
+			if(IsReceivedDatafromESP(Rx_Buffer_ESP)==FALSE){
+				if((CheckTimestampElapsed(timecurr_u32, (uint32_t)t_delay_u16)==TRUE)&&(TRUE==GetDataRXcomplete(&BL_UART,Rx_Buffer_ESP,0,ESPREADBUFF)) \
+					&&((Rx_Buffer_ESP[0]=='O')&&(Rx_Buffer_ESP[1]=='K')))
+					{			GetCurrentTimestamp(&timecurr_u32);
+								t_recheckState_en = ((uint8_t)t_LastRecheckState_en+1);
+								t_delay_u16 = 100u;
+								ClearRxBuffer();//clear buffer
+								memset(Rx_Buffer_ESP,0,ESPREADBUFF);
+					}
+				else if(CheckTimestampElapsed(timecurr_u32, (uint32_t)t_delay_u16)==TRUE){		/*retry send request*/
+								t_recheckState_en = t_LastRecheckState_en;
+								ESPErrorcnt_u8++;								
+								if(ESPErrorcnt_u8>ESPErrorMaxcnt){
+									ESPErrorcnt_u8=0;		
+									ESPGeneralState_u8 = 1;
+									HardResetESP();
+									ResetUARTESP();
+									SofResetSysem();
+								}
+					
+								return E_NOT_OK;
+					}	
+				else{
+					
+						return E_NOT_OK;
 				}
-			else if(CheckTimestampElapsed(timecurr_u32, (uint32_t)t_delay_u16)==TRUE){		/*retry send request*/
-							t_recheckState_en = t_LastRecheckState_en;
-							ESPErrorcnt_u8++;
-							if(ESPErrorcnt_u8>ESPErrorMaxcnt){
-								ESPErrorcnt_u8=0;
-								ESPGeneralState_u8 = 1;
-								HardResetESP();
-							}
-				
-							return E_NOT_OK;
-				}	
-			else{
-				
-					return E_NOT_OK;
+			}else{
+						return E_OK;
 			}
 		  break;			
 				
@@ -188,7 +203,8 @@ static uint8_t RecheckESPServer(void){
 			ClearRxBuffer();//clear buffer
 			memset(Rx_Buffer_ESP,0,ESPREADBUFF);
 			//Set as server
-			printf("AT+CIPSERVER=1,150\r\n");
+			//printf("AT+CIPSERVER=1,150\r\n");
+			printf("AT\r\n");
 	    //waiting for respond OK from module		
 			t_recheckState_en = WAITING;
 			t_delay_u16 = 100u;
@@ -217,7 +233,8 @@ uint8_t GetRawDatafromESP(void){
 			//parse data from esp then call RX copy data function of caller module
 			for(LoopIndex=0;LoopIndex<2;LoopIndex++){
 						
-					(void)CopyRXDataESPClbk[LoopIndex](Rx_Buffer_ESP);				
+					(void)CopyRXDataESPClbk[LoopIndex](Rx_Buffer_ESP);	
+					SendMessagetoESP(Rx_Buffer_ESP);
 			}
 			
 			RetVal = E_OK;
@@ -245,13 +262,14 @@ static uint8_t IsReceivedDatafromESP(char *Rx_Buffer_c){
 
 uint8_t SendMessagetoESP(char *data){
 	uint8_t datalenth_u8, portID;
-	printf("AT+CIPSEND=%d,%d",portID,datalenth_u8); 
-	printf("%s",data); 
+	printf("AT+CIPSEND=%d,%d\r\n",0, strlen(data)); 
+	HAL_Delay(5);//5ms
+	printf("%s\r\n",data); 
 	return E_OK;
 }
 
 uint8_t SaveESPInfoToNVM(void){
-	//Infor: SSID, PASS, Faultty, ESP status...
+	//Infor: SSID, PASS, Faulty, ESP status...
 	
 	return E_OK;
 	
