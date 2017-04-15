@@ -181,9 +181,8 @@ static uint8_t RecheckESPServer(void){
 								if(ESPErrorcnt_u8>ESPErrorMaxcnt){
 									ESPErrorcnt_u8=0;		
 									ESPGeneralState_u8 = 1;
-									HardResetESP();
 									ResetUARTESP();
-									SofResetSysem();
+
 								}
 					
 								return E_NOT_OK;
