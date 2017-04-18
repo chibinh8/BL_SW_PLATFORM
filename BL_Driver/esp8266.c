@@ -182,7 +182,8 @@ static uint8_t RecheckESPServer(void){
 									ESPErrorcnt_u8=0;		
 									ESPGeneralState_u8 = 1;
 									ResetUARTESP();
-
+									SofResetSysem();
+									
 								}
 					
 								return E_NOT_OK;
@@ -248,10 +249,18 @@ uint8_t GetRawDatafromESP(void){
 
 
 static uint8_t IsReceivedDatafromESP(char *Rx_Buffer_c){
-		
+		uint8_t loopindexcp_u8, loopindex_u8;
+		loopindexcp_u8 = 0;
 		if(TRUE==GetDataRXcomplete(&BL_UART,Rx_Buffer_c,0,ESPREADBUFF)){
-				if(Rx_Buffer_ESP[0]=='+'&&Rx_Buffer_ESP[1]=='I'&&Rx_Buffer_ESP[2]=='P'&&Rx_Buffer_ESP[3]=='D'&&Rx_Buffer_ESP[4]==','){
+				if(Rx_Buffer_c[0]=='+'&&Rx_Buffer_c[1]=='I'&&Rx_Buffer_c[2]=='P'&&Rx_Buffer_c[3]=='D'&&Rx_Buffer_c[4]==','){
 					 ClearRxBuffer();//clear buffer
+					 for(loopindex_u8=5; loopindex_u8<ESPREADBUFF;loopindex_u8++){
+							Rx_Buffer_c[loopindexcp_u8++] = Rx_Buffer_c[loopindex_u8];
+					 }
+					 for(loopindex_u8=ESPREADBUFF-5; loopindex_u8<ESPREADBUFF;loopindex_u8++){
+							Rx_Buffer_c[loopindex_u8] = 0;
+						 
+					 }
 					 return TRUE;
 				}				
 		}		

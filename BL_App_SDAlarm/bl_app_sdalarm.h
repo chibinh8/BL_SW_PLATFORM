@@ -6,4 +6,11 @@
 
 uint8_t CopyRXDataESPClbkSDAlarm(char* RXbuffer);
 
+typedef enum{
+	
+	INIT,
+	CYCLIC,
+	
+}AlarmSta_en;
+
 #endif

@@ -13,6 +13,10 @@ typedef enum{
 
 }BOOL;
 
+#define DEBUG_ESP
+#define DIAGRESPONSE 1
+
+
 #define  BL_BUFFSIZE   50
 #define  ESPREADBUFF   50
 #define  ALARMBUFF		 ESPREADBUFF	
