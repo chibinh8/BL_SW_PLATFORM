@@ -17,7 +17,7 @@ static uint8_t IsReceivedDatafromESP(char *Rx_Buffer_c);
 uint8_t GetRawDatafromESP(void);
 
 extern uint8_t (*CopyRXDataESPClbk[]) (char* RXbuffer);
-uint8_t SendMessagetoESP(char *data);
+
 
 void HardResetESP(void){
 	
@@ -234,7 +234,6 @@ uint8_t GetRawDatafromESP(void){
 			for(LoopIndex=0;LoopIndex<2;LoopIndex++){
 						
 					(void)CopyRXDataESPClbk[LoopIndex](Rx_Buffer_ESP);	
-					SendMessagetoESP(Rx_Buffer_ESP);
 			}
 			
 			RetVal = E_OK;
@@ -268,11 +267,13 @@ static uint8_t IsReceivedDatafromESP(char *Rx_Buffer_c){
 }
 
 
-uint8_t SendMessagetoESP(char *data){
-	uint8_t datalenth_u8, portID;
-	printf("AT+CIPSEND=%d,%d\r\n",0, strlen(data)); 
+uint8_t SendMessagetoESP(uint8_t *data, uint8_t len){
+	uint8_t datalenth_u8, portID, index;
+	printf("AT+CIPSEND=%d,%d\r\n",0, len); 
 	HAL_Delay(5);//5ms
-	printf("%s\r\n",data); 
+//	for (index=0; index<len; len++)
+//		printf("%d",data[index]);
+//	printf("\r\n"); 
 	return E_OK;
 }
 
