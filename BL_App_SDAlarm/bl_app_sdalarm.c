@@ -16,8 +16,8 @@ AlarmSta_en bl_al_AlarmMainstat_en;
 
 static char AlarmESPData[ALARMBUFF]; //25 bytes currently
 
-char ConfirmReqbyte[3] = {0xCB, 0xC4, 0xC5};
-char ConfirmRemotebyte[3] = {0xE1, 0xC4, 0xC5};
+uint8_t ConfirmReqbyte[3] = {0xCB, 0xC4, 0xC5};
+uint8_t ConfirmRemotebyte[3] = {0xE1, 0xC4, 0xC5};
 
 uint8_t CopyRXDataESPClbkSDAlarm(char* RXbuffer){
 		
@@ -26,9 +26,9 @@ uint8_t CopyRXDataESPClbkSDAlarm(char* RXbuffer){
 	  switch((uint8_t)(RXbuffer[STARTDATAINDEX])){
 			case APP_REQUESTBYTE:	
 				HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_13);
-				SendMessagetoESP(ConfirmReqbyte);				
+				SendMessagetoESP((char*)ConfirmReqbyte);				
 			
-			break;
+			  break;
 			
 			case APP_REMOTEBYTE:
 					HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_13);
@@ -36,7 +36,7 @@ uint8_t CopyRXDataESPClbkSDAlarm(char* RXbuffer){
 					ConfirmRemotebyte[2] = RXbuffer[STARTDATAINDEX+2] + 0x40;
 					ConfirmReqbyte[1] = ConfirmRemotebyte[1];
 					ConfirmReqbyte[2] = ConfirmRemotebyte[2];
-					SendMessagetoESP(ConfirmRemotebyte);			
+				  SendMessagetoESP((char*)ConfirmRemotebyte);			
 			
 			 break;
 			
