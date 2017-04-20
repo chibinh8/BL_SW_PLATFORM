@@ -3,6 +3,7 @@
 #include "BL_Define.h"
 
 #include "esp8266.h"
+#include "string.h"
 
 #define APP_REQUESTBYTE  0x8B
 #define APP_REMOTEBYTE   0xA1
@@ -10,40 +11,43 @@
 #define STARTDATAINDEX 4u
 
 
-BOOL bl_al_IsESPDatReceived_bo = FALSE;
+AlarmTasks_st  AlarmTasks;
 
-AlarmSta_en bl_al_AlarmMainstat_en;
-
-static char AlarmESPData[ALARMBUFF]; //25 bytes currently
 
 uint8_t ConfirmReqbyte[3] = {0xCB, 0xC4, 0xC5};
 
 uint8_t ConfirmRemotebyte[3] = {0xE1, 0xC4, 0xC5};
 
+void bl_al_AlarmInit(void){
+	
+	AlarmTasks.Mainstate = ALARM_IDLE;
+	AlarmTasks.TaskMode = TASKMODE_IDLE;	
+	AlarmTasks.IsESPDatReceived_bo = FALSE;
+}
+
 uint8_t CopyRXDataESPClbkSDAlarm(char* RXbuffer){
-		uint8_t tempreqbyte;
 
 	  switch((uint8_t)(RXbuffer[STARTDATAINDEX])){
 			case APP_REQUESTBYTE:	
-				bl_al_IsESPDatReceived_bo = TRUE;
-				#ifdef DEBUG_ESP
-				HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_13);
-				#endif				
-				tempreqbyte = ConfirmReqbyte[1];
-				ConfirmReqbyte[1] = ConfirmReqbyte[2];
-				ConfirmReqbyte[2] = tempreqbyte;
-				SendMessagetoESP((char*)ConfirmReqbyte);				
+					#ifdef DEBUG_ESP
+					HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_13);
+					#endif				
+					memcpy(AlarmTasks.AlarmESPData,RXbuffer,strlen(RXbuffer));
+					AlarmTasks.Mainstate = ALARM_CYCLIC;
+					AlarmTasks.TaskMode = REQUESTDEVICESTA;	
+					AlarmTasks.IsESPDatReceived_bo = TRUE;						
 				
 			  break;
 			
 			case APP_REMOTEBYTE:
-					bl_al_IsESPDatReceived_bo = TRUE;
+
+					#ifdef DEBUG_ESP
 					HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_13);
-					ConfirmRemotebyte[1] = RXbuffer[STARTDATAINDEX+1] + 0x40;
-					ConfirmRemotebyte[2] = RXbuffer[STARTDATAINDEX+2] + 0x40;
-					ConfirmReqbyte[1] = ConfirmRemotebyte[1];
-					ConfirmReqbyte[2] = ConfirmRemotebyte[2];
-				  SendMessagetoESP((char*)ConfirmRemotebyte);			
+					#endif		
+					memcpy(AlarmTasks.AlarmESPData,RXbuffer,strlen(RXbuffer));
+					AlarmTasks.Mainstate = ALARM_CYCLIC;
+					AlarmTasks.TaskMode = REMOTEDEVICE;	
+					AlarmTasks.IsESPDatReceived_bo = TRUE;	
 			
 			 break;
 			
@@ -57,16 +61,37 @@ uint8_t CopyRXDataESPClbkSDAlarm(char* RXbuffer){
 }
 
 void bl_al_AlarmCyclic(void){
-		switch(bl_al_AlarmMainstat_en){
-			case INIT:
-				if(bl_al_IsESPDatReceived_bo==TRUE){
+		switch(AlarmTasks.Mainstate){
+			
+			case ALARM_IDLE:
+				/*Do something while waiting for data*/
+				break;
+			case ALARM_CYCLIC:
+					/*Process action on according request type*/
+					switch(AlarmTasks.TaskMode){
+						case TASKMODE_IDLE:
+							/*Do something*/
+							break;
+						case REQUESTDEVICESTA:
+							/*process incoming data then do action*/
+							SendMessagetoESP((char*)AlarmTasks.ConfirmAlarm2App);	
+							AlarmTasks.TaskMode = TASKMODE_IDLE;
+							break;
+						case REMOTEDEVICE:			
+							/*process incoming data then do action*/
+						    
+							SendMessagetoESP((char*)AlarmTasks.ConfirmAlarm2App);				
+							AlarmTasks.TaskMode = TASKMODE_IDLE;
+						
+							break;
+						
+						default:
+							
+							break;				
+						
+					}
 					
-					bl_al_AlarmMainstat_en = CYCLIC;
-				}
-				break;
-			case CYCLIC:
-				
-				break;
+				 break;
 			default:
 				
 				break;
