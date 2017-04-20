@@ -280,7 +280,7 @@ uint8_t SendMessagetoESP(const char *data){
 	
 	uint8_t datalenth_u8, portID;
 	printf("AT+CIPSEND=%d,%d\r\n",0, strlen(data)); 
-	HAL_Delay(5);//5ms
+	HAL_Delay(3);//5ms
 	printf("%s\r\n",data);
 
 	return E_OK;

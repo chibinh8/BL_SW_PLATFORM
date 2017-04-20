@@ -14,9 +14,9 @@
 AlarmTasks_st  AlarmTasks;
 
 
-uint8_t ConfirmReqbyte[3] = {0xCB, 0xC4, 0xC5};
+const uint8_t ConfirmReqbyte[3] = {0xCB, 0xC4, 0xC5};
 
-uint8_t ConfirmRemotebyte[3] = {0xE1, 0xC4, 0xC5};
+const uint8_t ConfirmRemotebyte[3] = {0xE1, 0xC4, 0xC5};
 
 void bl_al_AlarmInit(void){
 	
@@ -74,12 +74,13 @@ void bl_al_AlarmCyclic(void){
 							break;
 						case REQUESTDEVICESTA:
 							/*process incoming data then do action*/
+							memcpy(AlarmTasks.ConfirmAlarm2App,ConfirmReqbyte,3);
 							SendMessagetoESP((char*)AlarmTasks.ConfirmAlarm2App);	
 							AlarmTasks.TaskMode = TASKMODE_IDLE;
 							break;
 						case REMOTEDEVICE:			
 							/*process incoming data then do action*/
-						    
+						  memcpy(AlarmTasks.ConfirmAlarm2App,ConfirmRemotebyte,3);
 							SendMessagetoESP((char*)AlarmTasks.ConfirmAlarm2App);				
 							AlarmTasks.TaskMode = TASKMODE_IDLE;
 						

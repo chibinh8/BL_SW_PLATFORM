@@ -35,5 +35,6 @@ typedef struct{
 }AlarmTasks_st;
 
 void bl_al_AlarmInit(void);
+void bl_al_AlarmCyclic(void);
 
 #endif
