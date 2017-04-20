@@ -1,5 +1,6 @@
 #include "BL_SystemInit.h"
 #include "dem.h"
+#include "bl_app_sdalarm.h"
 
 /** System Clock Configuration
 */
@@ -72,8 +73,8 @@ void BL_SystemInit(void){
 	InitPwm2Motors();
   /* USER CODE BEGIN 2 */ 
 	InitRCServo();	
-	if(E_OK==InitESp8266())
-			HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_14);
+	
+	bl_al_AlarmInit();
   /* USER CODE END 2 */
 	
 }

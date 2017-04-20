@@ -33,5 +33,7 @@ typedef struct{
 	uint8_t ConfirmAlarm2App[3];
 	char AlarmESPData[ALARMBUFF]; //25 bytes currently	
 }AlarmTasks_st;
-	
+
+void bl_al_AlarmInit(void);
+
 #endif
