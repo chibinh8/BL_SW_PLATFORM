@@ -29,6 +29,6 @@ uint8_t InitESp8266(void);
 
 void ESPOperationCyclic(void);
 
-uint8_t SendMessagetoESP(uint8_t *data, uint8_t len);
+uint8_t SendMessagetoESP(char *data);
 
 #endif
