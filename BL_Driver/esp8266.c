@@ -18,6 +18,8 @@ uint8_t GetRawDatafromESP(void);
 
 extern uint8_t (*CopyRXDataESPClbk[]) (char* RXbuffer);
 
+BOOL bl_esp_DataRecieved_bo = FALSE;
+
 void HardResetESP(void){
 	
 	HAL_GPIO_WritePin(GPIOD, GPIOPINESPRESET,GPIO_PIN_RESET);
@@ -94,10 +96,16 @@ void ESPOperationCyclic(void){
 		//Normal communication
 		(void)GetRawDatafromESP();
 			/*Recheck sever every 5s*/
-			if((CheckTimestampElapsed(timecurrCyc_u32, (uint32_t)5000))==TRUE){
-					ESPGeneralState_u8 = 3;
-					GetCurrentTimestamp(&timecurrCyc_u32);
-			}
+			if((CheckTimestampElapsed(timecurrCyc_u32, (uint32_t)5000))==TRUE){ 
+					if(bl_esp_DataRecieved_bo==FALSE){//over 5s but not receive data
+					   ESPGeneralState_u8 = 3; //change state to check sever status
+						 GetCurrentTimestamp(&timecurrCyc_u32);
+					}else					
+					{		
+						 bl_esp_DataRecieved_bo = FALSE;
+						 GetCurrentTimestamp(&timecurrCyc_u32);
+          }
+				}
 			break;
 		case 3: 			
 			
@@ -231,9 +239,9 @@ uint8_t GetRawDatafromESP(void){
 	if(TRUE==IsReceivedDatafromESP(Rx_Buffer_ESP)){ //data is exactly recieved from ESP
 			//parse data from esp then call RX copy data function of caller module
 			for(LoopIndex=0;LoopIndex<2;LoopIndex++){
-						
+					 bl_esp_DataRecieved_bo = TRUE;
 					(void)CopyRXDataESPClbk[LoopIndex](Rx_Buffer_ESP);	
-
+					 
 			}
 			
 			RetVal = E_OK;
@@ -260,6 +268,7 @@ static uint8_t IsReceivedDatafromESP(char *Rx_Buffer_c){
 							Rx_Buffer_c[loopindex_u8] = 0;
 						 
 					 }
+					 
 					 return TRUE;
 				}				
 		}		
@@ -267,7 +276,7 @@ static uint8_t IsReceivedDatafromESP(char *Rx_Buffer_c){
 }
 
 
-uint8_t SendMessagetoESP(char *data){
+uint8_t SendMessagetoESP(const char *data){
 	
 	uint8_t datalenth_u8, portID;
 	printf("AT+CIPSEND=%d,%d\r\n",0, strlen(data)); 

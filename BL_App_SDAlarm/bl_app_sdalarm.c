@@ -17,20 +17,27 @@ AlarmSta_en bl_al_AlarmMainstat_en;
 static char AlarmESPData[ALARMBUFF]; //25 bytes currently
 
 uint8_t ConfirmReqbyte[3] = {0xCB, 0xC4, 0xC5};
+
 uint8_t ConfirmRemotebyte[3] = {0xE1, 0xC4, 0xC5};
 
 uint8_t CopyRXDataESPClbkSDAlarm(char* RXbuffer){
-		
-		bl_al_IsESPDatReceived_bo = TRUE;
-		#ifdef DEBUG_ESP
+		uint8_t tempreqbyte;
+
 	  switch((uint8_t)(RXbuffer[STARTDATAINDEX])){
 			case APP_REQUESTBYTE:	
+				bl_al_IsESPDatReceived_bo = TRUE;
+				#ifdef DEBUG_ESP
 				HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_13);
+				#endif				
+				tempreqbyte = ConfirmReqbyte[1];
+				ConfirmReqbyte[1] = ConfirmReqbyte[2];
+				ConfirmReqbyte[2] = tempreqbyte;
 				SendMessagetoESP((char*)ConfirmReqbyte);				
-			
+				
 			  break;
 			
 			case APP_REMOTEBYTE:
+					bl_al_IsESPDatReceived_bo = TRUE;
 					HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_13);
 					ConfirmRemotebyte[1] = RXbuffer[STARTDATAINDEX+1] + 0x40;
 					ConfirmRemotebyte[2] = RXbuffer[STARTDATAINDEX+2] + 0x40;
@@ -46,7 +53,7 @@ uint8_t CopyRXDataESPClbkSDAlarm(char* RXbuffer){
 
 		}
 		return E_OK;
-		#endif
+
 }
 
 void bl_al_AlarmCyclic(void){

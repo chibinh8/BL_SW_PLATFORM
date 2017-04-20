@@ -5,6 +5,7 @@
 void Error_Handler(void){
 	
 	HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_13);
+	
 }
 
 

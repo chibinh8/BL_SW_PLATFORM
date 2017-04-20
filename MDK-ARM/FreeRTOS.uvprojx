@@ -918,19 +918,9 @@
               <FilePath>..\BL_Driver\gpio.c</FilePath>
             </File>
             <File>
-              <FileName>BL_SystemInit.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\BL_Driver\BL_SystemInit.c</FilePath>
-            </File>
-            <File>
               <FileName>pwm.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\BL_Driver\pwm.c</FilePath>
-            </File>
-            <File>
-              <FileName>BL_Define.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\BL_Driver\BL_Define.h</FilePath>
             </File>
             <File>
               <FileName>timer.c</FileName>
@@ -946,11 +936,6 @@
               <FileName>esp8266.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\BL_Driver\esp8266.c</FilePath>
-            </File>
-            <File>
-              <FileName>BL_SystemConfig.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\BL_Driver\BL_SystemConfig.h</FilePath>
             </File>
             <File>
               <FileName>BL_Ds1307.c</FileName>
@@ -1090,6 +1075,26 @@
               <FileName>EspCom_Cfg.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\BL_SystemConfig\EspCom_Cfg.c</FilePath>
+            </File>
+            <File>
+              <FileName>BL_Define.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\BL_SystemConfig\BL_Define.h</FilePath>
+            </File>
+            <File>
+              <FileName>BL_SystemConfig.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\BL_SystemConfig\BL_SystemConfig.h</FilePath>
+            </File>
+            <File>
+              <FileName>BL_SystemSWOption.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\BL_SystemConfig\BL_SystemSWOption.h</FilePath>
+            </File>
+            <File>
+              <FileName>BL_SystemInit.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\BL_SystemConfig\BL_SystemInit.c</FilePath>
             </File>
           </Files>
         </Group>
