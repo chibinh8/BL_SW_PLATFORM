@@ -4,7 +4,7 @@
  *      *** Do not modify ! ***
  *
  * Project: 'FreeRTOS' 
- * Target:  'FreeRTOS Configuration' 
+ * Target:  'BL_SW_FLATFORM' 
  */
 
 #ifndef RTE_COMPONENTS_H
