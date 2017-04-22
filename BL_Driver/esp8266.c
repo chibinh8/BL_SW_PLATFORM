@@ -5,16 +5,25 @@
 #include "cmsis_os.h" 
 #include "dem.h"
 #include "ECUModeManager.h"
+#include "flash.h"
 
 #define ESPErrorMaxcnt 10
 #define GPIOPINESPRESET GPIO_PIN_12
 
+#define ESPBASEADDR   ((uint32_t)0x080F0000)
+#define ESPCONFINFOR_AU8 ((const volatile uint8_t) *ESPBASEADDR)
+
 extern UART_HandleTypeDef BL_UART;
 static char Rx_Buffer_ESP[ESPREADBUFF];
+ESPInfor_st ESPInforConfg; 
+
 
 static uint8_t RecheckESPServer(void);
 static uint8_t IsReceivedDatafromESP(char *Rx_Buffer_c);
 uint8_t GetRawDatafromESP(void);
+uint8_t ReadESPInforfromNVM(void);
+uint8_t SaveESPInfoToNVM(void);
+
 
 extern uint8_t (*CopyRXDataESPClbk[]) (char* RXbuffer);
 
@@ -45,6 +54,12 @@ uint8_t ESPGeneralState_u8 = 1;
 
 uint8_t InitESp8266(void){	
 	
+	if(ReadESPInforfromNVM()==E_NOT_OK){
+		strcpy(&ESPInforConfg.SsId[0], SSID);
+		strcpy(&ESPInforConfg.Pass[0], PASS);
+		SaveESPInfoToNVM();
+	}
+			
 	EnableESP();
 	memset(Rx_Buffer_ESP,0,ESPREADBUFF);
 	ClearRxBuffer();
@@ -58,7 +73,7 @@ uint8_t InitESp8266(void){
 				//WiFi Mode is AP
 				printf("AT+CWMODE=2\r\n");
 				HAL_Delay(300);//300ms
-				printf("AT+CWSAP=\"%s\",\"%s\",3,0\r\n",SSID, PASS);
+				printf("AT+CWSAP=\"%s\",\"%s\",3,0\r\n",ESPInforConfg.SsId, ESPInforConfg.Pass);
 				HAL_Delay(100);
 				printf("AT+CIPSERVER=1,150\r\n");	
 				HAL_Delay(1000);//1s
@@ -304,10 +319,20 @@ uint8_t SendMessagetoESPWithLen(uint8_t *data, uint8_t len){
 
 uint8_t SaveESPInfoToNVM(void){
 	//Infor: SSID, PASS, Faulty, ESP status...
+	bl_fl_WriteByte2NVM((uint8_t*)&ESPInforConfg.SsId[0], ESPBASEADDR, sizeof(ESPInfor_st));
 	
 	return E_OK;
 	
 }
+
+uint8_t ReadESPInforfromNVM(void){
+		
+	bl_fl_ReadbytefromNVM((uint8_t*)&ESPInforConfg.SsId[0],ESPBASEADDR,sizeof(ESPInfor_st));
+	if((uint8_t)ESPInforConfg.SsId[0]==0xFF) return E_NOT_OK;
+	return E_OK;
+}
+
+
 
 
 
