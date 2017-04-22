@@ -270,19 +270,25 @@ static uint8_t IsReceivedDatafromESP(char *Rx_Buffer_c){
 					 }
 					 
 					 return TRUE;
-				}				
+					 
+				}else if(Rx_Buffer_c[0]=='>'){
+						ClearRxBuffer();//clear buffer
+						return TRUE;
+				}
 		}		
 	  return FALSE;
 }
 
 
-uint8_t SendMessagetoESP(const char *data){
+uint8_t SendMessagetoESP(ESPDatadef_st Data, ESPDataSendSta_en EspSendSta){
 	
 	uint8_t datalenth_u8, portID;
-	printf("AT+CIPSEND=%d,%d\r\n",0, strlen(data)); 
-	HAL_Delay(3);//5ms
-	printf("%s\r\n",data);
-
+	if(EspSendSta==WAITINGRES){
+		Data.Datatype==CHAR? printf("AT+CIPSEND=%d,%d\r\n",0, strlen(Data.data)):printf("AT+CIPSEND=%d,%d\r\n",0, Data.Len);
+	}
+	else if(EspSendSta==READY){
+	  printf("%s\r\n",Data.data);
+	}
 	return E_OK;
 }
 

@@ -11,6 +11,13 @@
 #define PASS		"123456"
 
 typedef enum{
+	
+	WAITINGRES,
+	READY,
+	
+}ESPDataSendSta_en;
+
+typedef enum{
 		WAITING,
 		STATE1,
 		STATE2,
@@ -24,11 +31,23 @@ typedef struct{
 	
 }ESPMessage_st;
 
+typedef enum{
+		UINT8,
+		SINT8,
+		STRING,
+		CHAR,	
+}Datatype_en;
+
+typedef struct{
+			Datatype_en  Datatype;
+			uint8_t Len;
+			void *data;
+}ESPDatadef_st;
 
 uint8_t InitESp8266(void);
 
 void ESPOperationCyclic(void);
 
-uint8_t SendMessagetoESP(const char *data);
+uint8_t SendMessagetoESP(ESPDatadef_st Data, ESPDataSendSta_en EspSendSta);
 
 #endif
