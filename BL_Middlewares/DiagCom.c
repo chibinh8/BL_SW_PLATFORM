@@ -197,5 +197,6 @@ uint8_t LearnSensorThresRequest(char* response,const DiagCommand_typedef Outcomm
 }
 
 uint8_t CopyRXDataESPClbkDiag(char* RXbuffer){
+	
 	return E_OK;
 }

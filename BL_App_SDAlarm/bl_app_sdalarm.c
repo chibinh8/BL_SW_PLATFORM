@@ -9,7 +9,8 @@
 #define APP_REMOTEBYTE   0xA1
 
 #define STARTDATAINDEX 4u
-
+#define CONFIRMRESLEN  3u
+#define CONFIRMRESBYTEOFFSET  0x40
 
 AlarmTasks_st  AlarmTasks;
 
@@ -18,9 +19,9 @@ AlarmTaskMode_en bl_alarm_LastTaskMode_en;
 
 ESPDatadef_st Confirmbyte_str;
 
-uint8_t ConfirmReqbyte[3] = {0xCB, 0xC4, 0xC5};
+uint8_t ConfirmReqbyte[CONFIRMRESLEN] = {0xCB, 0xC4, 0xC5};
 
-uint8_t ConfirmRemotebyte[3] = {0xE1, 0xC4, 0xC5};
+uint8_t ConfirmRemotebyte[CONFIRMRESLEN] = {0xE1, 0xC4, 0xC5};
 
 void bl_al_AlarmInit(void){
 	
@@ -29,7 +30,7 @@ void bl_al_AlarmInit(void){
 	AlarmTasks.IsESPDatReceived_bo = FALSE;
 	bl_alarm_SendataStatus = WAITINGRES;
 	Confirmbyte_str.Datatype = UINT8;
-	Confirmbyte_str.Len = 3;
+	Confirmbyte_str.Len = CONFIRMRESLEN;
 
 }
 
@@ -95,6 +96,8 @@ void bl_al_AlarmCyclic(void){
 							break;
 						case REQUESTDEVICESTA:
 							/*process incoming data then do action*/
+							ConfirmReqbyte[1] = ConfirmRemotebyte[1];
+							ConfirmReqbyte[2] = ConfirmRemotebyte[2];
 							Confirmbyte_str.data = (void*)&ConfirmReqbyte[0];
 							SendMessagetoESP(Confirmbyte_str, bl_alarm_SendataStatus);	
 							AlarmTasks.TaskMode = TASKMODE_IDLE;
@@ -102,9 +105,8 @@ void bl_al_AlarmCyclic(void){
 						case REMOTEDEVICE:			
 							/*process incoming data then do action*/
 							if(bl_alarm_SendataStatus==READY){
-							tempswap = ConfirmRemotebyte[1];
-							ConfirmRemotebyte[1] = ConfirmRemotebyte[2];
-							ConfirmRemotebyte[2] = tempswap;
+									ConfirmRemotebyte[1] = (uint8_t)AlarmTasks.AlarmESPData[STARTDATAINDEX+1]+CONFIRMRESBYTEOFFSET;
+									ConfirmRemotebyte[2] = (uint8_t)AlarmTasks.AlarmESPData[STARTDATAINDEX+2]+CONFIRMRESBYTEOFFSET;
 							}
 							Confirmbyte_str.data = (void*)&ConfirmRemotebyte[0];
 							SendMessagetoESP(Confirmbyte_str, bl_alarm_SendataStatus);		
