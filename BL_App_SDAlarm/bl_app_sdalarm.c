@@ -47,7 +47,7 @@ uint8_t CopyRXDataESPClbkSDAlarm(char* RXbuffer){
 			  break;
 			
 			case APP_REMOTEBYTE:
-
+					
 					#ifdef DEBUG_ESP
 					HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_13);
 					#endif		
@@ -65,9 +65,7 @@ uint8_t CopyRXDataESPClbkSDAlarm(char* RXbuffer){
 			default:
 					
 					if(((bl_alarm_LastTaskMode_en!=TASKMODE_IDLE)&&(uint8_t)(RXbuffer[0])==(uint8_t)'>')){
-						#ifdef DEBUG_ESP
-						HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_13);
-						#endif	
+	
 						bl_alarm_SendataStatus = READY;
 						AlarmTasks.Mainstate = ALARM_CYCLIC;
 						AlarmTasks.TaskMode = bl_alarm_LastTaskMode_en;
@@ -82,8 +80,7 @@ uint8_t CopyRXDataESPClbkSDAlarm(char* RXbuffer){
 
 void bl_al_AlarmCyclic(void){
 	
-
-	
+		uint8_t tempswap;	
 		switch(AlarmTasks.Mainstate){
 			
 			case ALARM_IDLE:
@@ -104,6 +101,11 @@ void bl_al_AlarmCyclic(void){
 							break;
 						case REMOTEDEVICE:			
 							/*process incoming data then do action*/
+							if(bl_alarm_SendataStatus==READY){
+							tempswap = ConfirmRemotebyte[1];
+							ConfirmRemotebyte[1] = ConfirmRemotebyte[2];
+							ConfirmRemotebyte[2] = tempswap;
+							}
 							Confirmbyte_str.data = (void*)&ConfirmRemotebyte[0];
 							SendMessagetoESP(Confirmbyte_str, bl_alarm_SendataStatus);		
 							AlarmTasks.TaskMode = TASKMODE_IDLE;
