@@ -1,4 +1,4 @@
-# FreeRTOS_BCR
+# BL_SW_FLATFORM
 # The personal DIY flatform.
 # Application: 
 # - RTOS based Software
