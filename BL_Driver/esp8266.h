@@ -48,10 +48,12 @@ typedef struct{
 	
 	char SsId[10];	
 	char Pass[10];	
-
+	
 }ESPInfor_st;
 
 uint8_t InitESp8266(void);
+
+uint8_t bl_esp_InitESPSys(void);
 
 void ESPOperationCyclic(void);
 

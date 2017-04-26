@@ -7,6 +7,7 @@
 
 #define APP_REQUESTBYTE  0x8B
 #define APP_REMOTEBYTE   0xA1
+#define APP_CONFIGWIFI   0xA5
 
 #define STARTDATAINDEX 4u
 #define CONFIRMRESLEN  3u
@@ -60,9 +61,15 @@ uint8_t CopyRXDataESPClbkSDAlarm(char* RXbuffer){
 					bl_alarm_SendataStatus = WAITINGRES;
 			
 				break;
+			case APP_CONFIGWIFI:
+					memcpy(AlarmTasks.AlarmESPData,RXbuffer,strlen(RXbuffer));
+					AlarmTasks.Mainstate = ALARM_CYCLIC;
+					AlarmTasks.TaskMode = WIFICONFIG;	
+					AlarmTasks.IsESPDatReceived_bo = TRUE;	
+					bl_alarm_LastTaskMode_en = WIFICONFIG;
+					bl_alarm_SendataStatus = WAITINGRES;				
 				
-			 break;
-			
+				break;
 			default:
 					
 					if(((bl_alarm_LastTaskMode_en!=TASKMODE_IDLE)&&(uint8_t)(RXbuffer[0])==(uint8_t)'>')){
@@ -128,4 +135,7 @@ void bl_al_AlarmCyclic(void){
 		}
 	
 }
+
+
+
 

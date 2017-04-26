@@ -62,6 +62,7 @@ void BL_SystemInit(void){
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+
 	/*ADC Init*/
 	BL_ADCInit();
 	/*UART Init*/
@@ -73,7 +74,7 @@ void BL_SystemInit(void){
 	InitPwm2Motors();
   /* USER CODE BEGIN 2 */ 
 	InitRCServo();	
-	
+	bl_esp_InitESPSys();
 	bl_al_AlarmInit();
   /* USER CODE END 2 */
 	

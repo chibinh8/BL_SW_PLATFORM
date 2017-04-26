@@ -140,12 +140,11 @@ void StartUserTask(void const * argument)
   /* Infinite loop */
 		for(;;)
 		{  
+
 			ESPOperationCyclic();
-			
 			bl_al_AlarmCyclic();
-			
 			ProcessDiagserviceCyclicMain();			
-			osDelay(50);
+			osDelay(100);
 		}
 }
 	/* StartDefaultTask function */
@@ -156,7 +155,7 @@ void Start10msTask(void const * argument)
   /* Infinite loop */
   for(;;)
   {	
-		
+
 		ADCSensorMaincyclic();
     osDelay(20);
   }

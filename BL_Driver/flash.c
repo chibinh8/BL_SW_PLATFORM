@@ -7,6 +7,8 @@
 #define ADCSENSORTHRES_REG  ((const volatile uint16_t *)ADCSENSORTHRES_BASE)
 
 #define ADCSENSORTHRES ((const volatile BL_AdcThres_Type *)ADCSENSORTHRES_BASE)
+	
+#define GETBASEADDRESS(BaseAddress_u32)  ((const volatile uint8_t *)BaseAddress_u32);
 
 void ReadADCThreshold(	BL_AdcThres_Type *adcreadthres){
 	/*need to be defined*/
@@ -55,8 +57,8 @@ uint8_t bl_fl_WriteByte2NVM(const uint8_t* data2write_u8, const uint32_t BaseAdd
 }
 
 uint8_t bl_fl_ReadbytefromNVM(uint8_t* data2Read_u8, const uint32_t BaseAddress_u32, uint8_t Numofbyte){
-		
-	const volatile uint8_t *ADD_REG  = ((const volatile uint8_t *)BaseAddress_u32);
-	memcpy((void*)data2Read_u8, (void*)ADD_REG ,Numofbyte);
+	
+	memcpy(data2Read_u8,((const volatile uint8_t *)BaseAddress_u32),Numofbyte);
+
 	return E_OK;
 }

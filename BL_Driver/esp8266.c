@@ -10,7 +10,7 @@
 #define ESPErrorMaxcnt 10
 #define GPIOPINESPRESET GPIO_PIN_12
 
-#define ESPBASEADDR   ((uint32_t)0x080F0000)
+#define ESPBASEADDR   ((uint32_t)0x080E0FF)
 #define ESPCONFINFOR_AU8 ((const volatile uint8_t) *ESPBASEADDR)
 
 extern UART_HandleTypeDef BL_UART;
@@ -49,40 +49,83 @@ void DisableESPHardware(void){
 }
 
 
-
 uint8_t ESPGeneralState_u8 = 1;
+uint8_t bl_esp_Initsta_u8 = 0;
+uint8_t bl_esp_LastInitsta_u8 = 0;
+static uint32_t InittimecurrCyc_u32 = 0;
+static uint32_t InitTimeDelay_u32 = 0;
+
+uint8_t bl_esp_InitESPSys(void){
+		  if(ReadESPInforfromNVM()==E_NOT_OK){
+				strcpy(&ESPInforConfg.SsId[0], SSID);
+				strcpy(&ESPInforConfg.Pass[0], PASS);
+				SaveESPInfoToNVM();
+		  }	
+			return E_OK;
+}
 
 uint8_t InitESp8266(void){	
-	
-	if(ReadESPInforfromNVM()==E_NOT_OK){
-		strcpy(&ESPInforConfg.SsId[0], SSID);
-		strcpy(&ESPInforConfg.Pass[0], PASS);
-		SaveESPInfoToNVM();
-	}
+	switch(bl_esp_Initsta_u8){
+
+		case 0: 
+		
+			EnableESP();
+			memset(Rx_Buffer_ESP,0,ESPREADBUFF);
+			ClearRxBuffer();	
+			bl_esp_Initsta_u8 = 1;
+		  break;
+		case 1:
+				printf("AT\r\n");
+				bl_esp_Initsta_u8 = 2;
+				GetCurrentTimestamp(&InittimecurrCyc_u32);
+				InitTimeDelay_u32 = 100u;
+				bl_esp_LastInitsta_u8 = bl_esp_Initsta_u8;
+				break;
+		case 2: //wait state
+			if((CheckTimestampElapsed(InittimecurrCyc_u32, (uint32_t)InitTimeDelay_u32))==TRUE){
+					bl_esp_Initsta_u8 = bl_esp_LastInitsta_u8+1;
+			}
+			break;
+		case 3:
+				printf("AT+CIPMUX=1\r\n");				
+				GetCurrentTimestamp(&InittimecurrCyc_u32);
+				InitTimeDelay_u32 = 300u;
+				bl_esp_LastInitsta_u8 = bl_esp_Initsta_u8;	
+				bl_esp_Initsta_u8 = 2;
+				break;
+		case 4: 
+				printf("AT+CWMODE=2\r\n");				
+				GetCurrentTimestamp(&InittimecurrCyc_u32);
+				InitTimeDelay_u32 = 300u;
+				bl_esp_LastInitsta_u8 = bl_esp_Initsta_u8;	
+				bl_esp_Initsta_u8 = 2;
+				break;				
+		case 5: 
+				printf("AT+CWSAP=\"%s\",\"%s\",3,0\r\n",SSID, PASS);			
+				GetCurrentTimestamp(&InittimecurrCyc_u32);
+				InitTimeDelay_u32 = 100u;
+				bl_esp_LastInitsta_u8 = bl_esp_Initsta_u8;	
+				bl_esp_Initsta_u8 = 2;
+				break;	
+		case 6: 
+				printf("AT+CIPSERVER=1,150\r\n");			
+				GetCurrentTimestamp(&InittimecurrCyc_u32);
+				InitTimeDelay_u32 = 1000u;
+				bl_esp_LastInitsta_u8 = bl_esp_Initsta_u8;	
+				bl_esp_Initsta_u8 = 2;
+				break;	
+		case 7: 
+			ClearRxBuffer();//clear buffer
+			return E_OK;
+			break;
+		
+		default:
 			
-	EnableESP();
-	memset(Rx_Buffer_ESP,0,ESPREADBUFF);
-	ClearRxBuffer();
-	printf("AT\r\n");
-	HAL_Delay(100);
+		    break;		
+		
+	}
 	
-	if(TRUE==GetDataRXcomplete(&BL_UART,Rx_Buffer_ESP,0,ESPREADBUFF)){
-			if((Rx_Buffer_ESP[0]=='O')&&(Rx_Buffer_ESP[1]=='K')){
-				printf("AT+CIPMUX=1\r\n");
-				HAL_Delay(300);
-				//WiFi Mode is AP
-				printf("AT+CWMODE=2\r\n");
-				HAL_Delay(300);//300ms
-				printf("AT+CWSAP=\"%s\",\"%s\",3,0\r\n",ESPInforConfg.SsId, ESPInforConfg.Pass);
-				HAL_Delay(100);
-				printf("AT+CIPSERVER=1,150\r\n");	
-				HAL_Delay(1000);//1s
-				ClearRxBuffer();//clear buffer
-				return E_OK;
-		}				
-	}	
-	
-  return E_NOT_OK;
+	return E_NOT_OK;
 	
 }
 
@@ -101,7 +144,8 @@ void ESPOperationCyclic(void){
 			 ESPGeneralState_u8 = 2;
 			 HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_14);
 			 GetCurrentTimestamp(&timecurrCyc_u32);
-		  }else if((CheckTimestampElapsed(timecurrCyc_u32, (uint32_t)10000))==TRUE){
+		  }
+			else if((CheckTimestampElapsed(timecurrCyc_u32, (uint32_t)10000))==TRUE){
 					HardResetESP();
 					ESPGeneralState_u8 = 0;
 			}

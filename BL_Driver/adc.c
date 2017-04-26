@@ -38,7 +38,7 @@ static void MX_ADC2_Init(void);
     PB0     ------> ADC1_IN8
     PB1     ------> ADC1_IN9 
 */
-const uint32_t SensorChannelADC1tbl[NumOfSensor1] = { ADC_CHANNEL_10, ADC_CHANNEL_11, ADC_CHANNEL_12, ADC_CHANNEL_1, ADC_CHANNEL_14, ADC_CHANNEL_15, ADC_CHANNEL_8, ADC_CHANNEL_9};
+const uint32_t SensorChannelADC1tbl[NumOfSensor1] = { ADC_CHANNEL_8, ADC_CHANNEL_11, ADC_CHANNEL_12, ADC_CHANNEL_1, ADC_CHANNEL_10, ADC_CHANNEL_9, ADC_CHANNEL_14, ADC_CHANNEL_15};
 #ifdef USEADC2
 const uint32_t SensorChannelADC2tbl[NumOfSensor2] = {0};
 #endif
@@ -192,7 +192,7 @@ void ReadAllRawSensorfromLine(void){
 BOOL ReadAllFinalSensorfromLine(uint16_t *AllsensorFinalVal){
 	
 	if(IsFilterDone==TRUE) {
-		memcpy(AllsensorFinalVal, FilteredSensorVal, NumofSensor*2);
+		memcpy(AllsensorFinalVal, FilteredSensorVal, NumofSensor*sizeof(uint16_t));
 		IsFilterDone = FALSE;
 		return TRUE;	
 	}	
@@ -249,11 +249,11 @@ void SensorThresCalib(void){
 	switch (bl_adc_Calibstat_u8){
 		
 		case 1: //read ADC for BACLK color
-			memcpy((void*)adcreadthres.blackupperthres, FilteredSensorVal, NumofSensor);
+			memcpy((void*)adcreadthres.blackupperthres, FilteredSensorVal, NumofSensor*sizeof(uint16_t));
 			
 			break;
 		case 2: 
-			memcpy((void*)adcreadthres.whitelowwerthres, FilteredSensorVal, NumofSensor);
+			memcpy((void*)adcreadthres.whitelowwerthres, FilteredSensorVal, NumofSensor*sizeof(uint16_t));
 		
 			break;
 		case 3: //save ADC value to Flash			
@@ -264,9 +264,10 @@ void SensorThresCalib(void){
 			}
 			break;
 		case 4 : 			
-				if(FALSE==CheckTimestampElapsed(currtime_u32, 1000)) //1s
+				if(FALSE==CheckTimestampElapsed(currtime_u32, 1000)){ //1s
 					//blink LED to indicate NVM writing threshold process is done
-						HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_12);
+					//	HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_12);
+				}
 				else
 					bl_adc_Calibstat_u8 = 255; //change to default state
 		
