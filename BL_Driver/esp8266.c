@@ -10,7 +10,7 @@
 #define ESPErrorMaxcnt 10
 #define GPIOPINESPRESET GPIO_PIN_12
 
-#define ESPBASEADDR   ((uint32_t)0x080E0FF)
+#define ESPBASEADDR   ((uint32_t)0x080F0000)
 #define ESPCONFINFOR_AU8 ((const volatile uint8_t) *ESPBASEADDR)
 
 extern UART_HandleTypeDef BL_UART;
