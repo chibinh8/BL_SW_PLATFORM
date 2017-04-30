@@ -69,6 +69,7 @@ void BL_ADCInit(void){
 	memcpy(ADCSensorBlackUpperThres, (const uint16_t*)adcthres_t.blackupperthres, NumofSensor*sizeof(uint16_t));
 	memcpy(ADCSensorWhiteLowerThres, (const uint16_t*)adcthres_t.whitelowwerthres, NumofSensor*sizeof(uint16_t));
 	bl_adc_DataCompareThres();
+
 }
 
 /* ADC1 init function */
@@ -257,10 +258,11 @@ void SensorThresCalib(void){
 			break;
 		case 2: 
 			memcpy((void*)adcreadthres.whitelowwerthres, FilteredSensorVal, NumofSensor*sizeof(uint16_t));
-		
+			GetCurrentTimestamp(&currtime_u32);
 			break;
 		case 3: //save ADC value to Flash			
-			if(HAL_OK==SaveADCThreshold2NVM(adcreadthres)){
+			//memset(&adcreadthres,0xCC, sizeof(BL_AdcThres_Type));
+			if((E_OK==SaveADCThreshold2NVM(adcreadthres))){
 						bl_adc_Calibstat_u8 = 4;//default val, if saving process is not sucessfilly, try in next cycle
 						//get current time
 					  GetCurrentTimestamp(&currtime_u32);

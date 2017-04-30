@@ -17,24 +17,29 @@ void ReadADCThreshold(	BL_AdcThres_Type *adcreadthres){
 }
 
 
-HAL_StatusTypeDef SaveADCThreshold2NVM(const BL_AdcThres_Type AdcThres){
+uint8_t SaveADCThreshold2NVM(const BL_AdcThres_Type AdcThres){
 	/*need to be defined*/
 	uint8_t i=0;
-	HAL_StatusTypeDef RETVAL;
+	uint8_t RETVAL = E_NOT_OK;
 	volatile uint32_t addressflash = ADCSENSORTHRES_BASE;
 	HAL_FLASH_Unlock();
 	for(i=0; i<NumofSensor;i++)
 		{
-			RETVAL = HAL_FLASH_Program(FLASH_TYPEPROGRAM_HALFWORD, addressflash,AdcThres.blackupperthres[i]);			
+			if(HAL_FLASH_Program(FLASH_TYPEPROGRAM_HALFWORD, addressflash, AdcThres.blackupperthres[i])!=HAL_OK){
+				return E_NOT_OK;
+			}
 			addressflash +=2; //2 bytes
 		}
 	for(i=0; i<NumofSensor;i++)
 		{
-			RETVAL = HAL_FLASH_Program(FLASH_TYPEPROGRAM_HALFWORD, addressflash,AdcThres.whitelowwerthres[i]);			
+			if(HAL_FLASH_Program(FLASH_TYPEPROGRAM_HALFWORD, addressflash,AdcThres.whitelowwerthres[i])!=HAL_OK){
+				return E_NOT_OK;
+			}
 			addressflash +=2; //2 bytes
 		}
 	HAL_FLASH_Lock(); 
-	return RETVAL;
+
+	return E_OK;
 }
 
 void ReadADCThresholdfromNVM(uint16_t *val2write){

@@ -141,8 +141,8 @@ void StartUserTask(void const * argument)
 		for(;;)
 		{  
 
-			ESPOperationCyclic();
-			bl_al_AlarmCyclic();
+			//ESPOperationCyclic();
+			//bl_al_AlarmCyclic();
 			ProcessDiagserviceCyclicMain();			
 			osDelay(100);
 		}
