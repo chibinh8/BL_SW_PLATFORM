@@ -1066,6 +1066,11 @@
               <FileType>1</FileType>
               <FilePath>..\BL_App_SDAlarm\bl_app_sdalarm.c</FilePath>
             </File>
+            <File>
+              <FileName>bl_rc_FollowLineRacer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\BL_App_FollLineRacer\bl_rc_FollowLineRacer.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
