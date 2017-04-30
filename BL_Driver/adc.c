@@ -18,7 +18,7 @@ uint16_t ringbuff[NumofSensor][NumofSampling] = {0};
 uint16_t FilteredSensorVal[NumofSensor]={0};
 ADCMode ADCSensorRunmode = CYCLIC;
 LineState SensorStateArray[NumofSensor][2] = {UNDEFINE};
-
+LineState FinalLineSensorState[NumofSensor] = {UNDEFINE};
 static BOOL IsFilterDone = FALSE;
 static uint16_t ADCSensorBlackUpperThres[NumofSensor] = {0};
 static uint16_t ADCSensorWhiteLowerThres[NumofSensor] = {0};
@@ -209,7 +209,7 @@ WHITE --> if digital input is lower or equal to it's lower threshold
 Note: Threshold is calibrated value which is stored in flalsh memory before.
 */
 
-BOOL ReadStatusofAllsensor(uint8_t * OutStatusSS){
+BOOL ReadStatusofAllsensorWithOffset(uint8_t * OutStatusSS){
 	
 	if(IsFilterDone==TRUE) {
 		for(int i=0; i<NumofSensor; i++){
@@ -217,6 +217,27 @@ BOOL ReadStatusofAllsensor(uint8_t * OutStatusSS){
 					OutStatusSS[i] = BLACK;
 				else if(FilteredSensorVal[i]<=(ADCSensorWhiteLowerThres[i]+ WHITEOFFSET))
 					OutStatusSS[i] = WHITE;
+				else {
+					OutStatusSS[i] = UNDEFINE;	//The input value is not in defined range.			
+					//do nothing
+				}	
+			}
+		IsFilterDone = FALSE;
+		return TRUE;	
+	}	
+	return FALSE;	
+}
+
+BOOL ReadStatusofAllsensor(LineState * OutStatusSS){
+	uint16_t MeanWhiteBlack_u16; 
+	
+	if(IsFilterDone==TRUE) {
+		for(int i=0; i<NumofSensor; i++){
+				MeanWhiteBlack_u16 = (ADCSensorBlackUpperThres[i] + ADCSensorWhiteLowerThres[i])>>1;
+				if(FilteredSensorVal[i]>(MeanWhiteBlack_u16 + BLACKOFFSET))
+					OutStatusSS[i] = SensorStateArray[i][0];				
+				else if(FilteredSensorVal[i]<(MeanWhiteBlack_u16-WHITEOFFSET))
+					OutStatusSS[i] = SensorStateArray[i][1];
 				else {
 					OutStatusSS[i] = UNDEFINE;	//The input value is not in defined range.			
 					//do nothing
@@ -295,6 +316,7 @@ void ADCSensorMaincyclic(void){
 		   break;
 		case CYCLIC:			 
 				ReadAllRawSensorfromLine();
+				ReadStatusofAllsensor(&FinalLineSensorState[0]);
 				/*change state condition should be added here*/
 				break;
 		default:			
