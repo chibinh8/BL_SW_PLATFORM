@@ -17,6 +17,7 @@ ADC_HandleTypeDef hadc2;
 uint16_t ringbuff[NumofSensor][NumofSampling] = {0};
 uint16_t FilteredSensorVal[NumofSensor]={0};
 ADCMode ADCSensorRunmode = CYCLIC;
+LineState SensorStateArray[NumofSensor][2] = {UNDEFINE};
 
 static BOOL IsFilterDone = FALSE;
 static uint16_t ADCSensorBlackUpperThres[NumofSensor] = {0};
@@ -44,6 +45,7 @@ const uint32_t SensorChannelADC2tbl[NumOfSensor2] = {0};
 #endif
 static uint8_t EleBuffIndex = 0;
 
+void bl_adc_DataCompareThres(void);
 
 static void InitRingbuffsensor(void){
 		memset((uint16_t*)ringbuff, 0, (uint8_t)(NumofSampling*NumofSensor*sizeof(uint16_t)));
@@ -66,6 +68,7 @@ void BL_ADCInit(void){
 	ReadADCThreshold(&adcthres_t);
 	memcpy(ADCSensorBlackUpperThres, (const uint16_t*)adcthres_t.blackupperthres, NumofSensor*sizeof(uint16_t));
 	memcpy(ADCSensorWhiteLowerThres, (const uint16_t*)adcthres_t.whitelowwerthres, NumofSensor*sizeof(uint16_t));
+	bl_adc_DataCompareThres();
 }
 
 /* ADC1 init function */
@@ -298,4 +301,18 @@ void ADCSensorMaincyclic(void){
 }
 
 
+void bl_adc_DataCompareThres(void){
+	uint8_t LoopIndex;
+	for(LoopIndex=0;LoopIndex<NumofSensor;LoopIndex++){
+			if(ADCSensorBlackUpperThres[LoopIndex]>ADCSensorWhiteLowerThres[LoopIndex]){
+					SensorStateArray[LoopIndex][0] = BLACK;
+					SensorStateArray[LoopIndex][1] = WHITE;
+			}else if(ADCSensorBlackUpperThres[LoopIndex]<ADCSensorWhiteLowerThres[LoopIndex]){
+					SensorStateArray[LoopIndex][0] = WHITE;
+					SensorStateArray[LoopIndex][1] = BLACK;					
+			}
+		
+	}
+	
+}
 

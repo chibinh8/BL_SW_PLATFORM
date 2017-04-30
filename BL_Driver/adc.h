@@ -8,11 +8,11 @@
 #include "flash.h"
 
 
-enum LineState{
+typedef enum {
 		BLACK,
 		WHITE,
 		UNDEFINE,
-};
+}LineState;
 
 typedef enum{
 		CALIB,
