@@ -8,8 +8,8 @@ ADC_HandleTypeDef hadc1;
 ADC_HandleTypeDef hadc2;
 #endif
 
-#define BLACKOFFSET   1 
-#define WHITEOFFSET   1 
+#define BLACKOFFSET   0 
+#define WHITEOFFSET   0
 
 //ring buffer for each sensor sor will be allocated to make signal smooth
 //there are 8 sensors
@@ -234,9 +234,9 @@ BOOL ReadStatusofAllsensor(LineState * OutStatusSS){
 	if(IsFilterDone==TRUE) {
 		for(int i=0; i<NumofSensor; i++){
 				MeanWhiteBlack_u16 = (ADCSensorBlackUpperThres[i] + ADCSensorWhiteLowerThres[i])>>1;
-				if(FilteredSensorVal[i]>(MeanWhiteBlack_u16 + BLACKOFFSET))
+				if(FilteredSensorVal[i]>(MeanWhiteBlack_u16 + WHITEOFFSET))
 					OutStatusSS[i] = SensorStateArray[i][0];				
-				else if(FilteredSensorVal[i]<(MeanWhiteBlack_u16-WHITEOFFSET))
+				else if(FilteredSensorVal[i]<(MeanWhiteBlack_u16-BLACKOFFSET))
 					OutStatusSS[i] = SensorStateArray[i][1];
 				else {
 					OutStatusSS[i] = UNDEFINE;	//The input value is not in defined range.			
@@ -279,7 +279,7 @@ void SensorThresCalib(void){
 			break;
 		case 2: 
 			memcpy((void*)adcreadthres.whitelowwerthres, FilteredSensorVal, NumofSensor*sizeof(uint16_t));
-			GetCurrentTimestamp(&currtime_u32);
+
 			break;
 		case 3: //save ADC value to Flash			
 			//memset(&adcreadthres,0xCC, sizeof(BL_AdcThres_Type));
@@ -290,13 +290,20 @@ void SensorThresCalib(void){
 			}
 			break;
 		case 4 : 			
-				if(FALSE==CheckTimestampElapsed(currtime_u32, 1000)){ //1s
+				if(FALSE==CheckTimestampElapsed(currtime_u32, 4000)){ //1s
 					//blink LED to indicate NVM writing threshold process is done
-					//	HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_12);
+						HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_14);						
 				}
 				else
 					bl_adc_Calibstat_u8 = 255; //change to default state
-		
+				break;
+		case 5: //debug only
+				memcpy(ADCSensorBlackUpperThres, &FilteredSensorVal[0], NumofSensor*sizeof(uint16_t));
+				break;
+		case 6: //debug only
+				memcpy(ADCSensorWhiteLowerThres, &FilteredSensorVal[0], NumofSensor*sizeof(uint16_t));
+				bl_adc_DataCompareThres();
+		  break;
 		default:
 				/*do nothing*/
 				break;
@@ -316,7 +323,7 @@ void ADCSensorMaincyclic(void){
 		   break;
 		case CYCLIC:			 
 				ReadAllRawSensorfromLine();
-				ReadStatusofAllsensor(&FinalLineSensorState[0]);
+				ReadStatusofAllsensor(FinalLineSensorState);
 				/*change state condition should be added here*/
 				break;
 		default:			

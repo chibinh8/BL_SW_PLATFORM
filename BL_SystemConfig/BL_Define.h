@@ -21,7 +21,7 @@ typedef enum{
 #define  ESPREADBUFF   50
 #define  ALARMBUFF		 ESPREADBUFF	
 
-#define NumofSampling 8
+#define NumofSampling 4
 #define NumOfSensor1 8
 #define NumOfSensor2 0
 #define NumofSensor (uint8_t)(NumOfSensor1+NumOfSensor2)
@@ -30,8 +30,8 @@ typedef enum{
 #define RETSTATE
 
 typedef enum{
-	E_OK,
 	E_NOT_OK,	
+	E_OK
 }retstate;
 #endif 
 

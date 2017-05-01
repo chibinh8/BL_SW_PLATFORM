@@ -1,6 +1,7 @@
 #include "flash.h"
 #include "stm32f4xx_hal_flash.h"
 #include "string.h"
+#include "cmsis_os.h" 
 
 #define ADCSENSORTHRES_BASE ((uint32_t)0x080E0000)
 
@@ -21,7 +22,8 @@ uint8_t SaveADCThreshold2NVM(const BL_AdcThres_Type AdcThres){
 	/*need to be defined*/
 	uint8_t i=0;
 	uint8_t RETVAL = E_NOT_OK;
-	volatile uint32_t addressflash = ADCSENSORTHRES_BASE;
+	static volatile uint32_t addressflash = ADCSENSORTHRES_BASE;
+	taskENTER_CRITICAL();
 	HAL_FLASH_Unlock();
 	for(i=0; i<NumofSensor;i++)
 		{
@@ -38,7 +40,7 @@ uint8_t SaveADCThreshold2NVM(const BL_AdcThres_Type AdcThres){
 			addressflash +=2; //2 bytes
 		}
 	HAL_FLASH_Lock(); 
-
+	taskEXIT_CRITICAL();
 	return E_OK;
 }
 

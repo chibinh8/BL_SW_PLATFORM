@@ -248,7 +248,7 @@ static uint8_t RecheckESPServer(void){
 									ESPErrorcnt_u8=0;		
 									ESPGeneralState_u8 = 1;
 									ResetUARTESP();
-									SofResetSysem();
+									//SofResetSysem();
 									
 								}
 					
