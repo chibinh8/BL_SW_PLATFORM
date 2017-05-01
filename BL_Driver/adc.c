@@ -2,6 +2,8 @@
 #include "string.h"
 #include "timer.h"
 #include "dem.h"
+#include "cmsis_os.h" 
+
 ADC_HandleTypeDef hadc1;
 
 #ifdef USEADC2
@@ -10,6 +12,14 @@ ADC_HandleTypeDef hadc2;
 
 #define BLACKOFFSET   0 
 #define WHITEOFFSET   0
+
+#define ADCSENSORTHRES_REG  ((const volatile uint16_t *)ADCSENSORTHRES_BASE)
+
+#define ADCSENSORTHRES ((const volatile BL_AdcThres_Type *)ADCSENSORTHRES_BASE)
+	
+#define GETBASEADDRESS(BaseAddress_u32)  ((const volatile uint8_t *)BaseAddress_u32)
+#define ADCSENSORTHRES_BASE ((uint32_t)0x080E0000)
+
 
 //ring buffer for each sensor sor will be allocated to make signal smooth
 //there are 8 sensors
@@ -348,3 +358,40 @@ void bl_adc_DataCompareThres(void){
 	
 }
 
+void ReadADCThreshold(	BL_AdcThres_Type *adcreadthres){
+	/*need to be defined*/
+	memcpy((void*)adcreadthres->blackupperthres, (void*)ADCSENSORTHRES->blackupperthres,NumofSensor*2);
+	memcpy((void*)adcreadthres->whitelowwerthres, (void*)ADCSENSORTHRES->whitelowwerthres,NumofSensor*2);
+}
+
+
+uint8_t SaveADCThreshold2NVM(const BL_AdcThres_Type AdcThres){
+	/*need to be defined*/
+	uint8_t i=0;
+	uint8_t RETVAL = E_NOT_OK;
+	static volatile uint32_t addressflash = ADCSENSORTHRES_BASE;
+	taskENTER_CRITICAL();
+	HAL_FLASH_Unlock();
+	for(i=0; i<NumofSensor;i++)
+		{
+			if(HAL_FLASH_Program(FLASH_TYPEPROGRAM_HALFWORD, addressflash, AdcThres.blackupperthres[i])!=HAL_OK){
+				return E_NOT_OK;
+			}
+			addressflash +=2; //2 bytes
+		}
+	for(i=0; i<NumofSensor;i++)
+		{
+			if(HAL_FLASH_Program(FLASH_TYPEPROGRAM_HALFWORD, addressflash,AdcThres.whitelowwerthres[i])!=HAL_OK){
+				return E_NOT_OK;
+			}
+			addressflash +=2; //2 bytes
+		}
+	HAL_FLASH_Lock(); 
+	taskEXIT_CRITICAL();
+	return E_OK;
+}
+
+void ReadADCThresholdfromNVM(uint16_t *val2write){
+	*val2write = (*ADCSENSORTHRES_REG);
+	
+}

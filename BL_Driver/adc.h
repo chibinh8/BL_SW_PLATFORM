@@ -7,6 +7,11 @@
 
 #include "flash.h"
 
+typedef struct{
+		__IO uint16_t blackupperthres[NumofSensor];
+		__IO uint16_t whitelowwerthres[NumofSensor];
+		
+}BL_AdcThres_Type;
 
 typedef enum {
 		BLACK,
@@ -32,6 +37,11 @@ void ReadAllRawSensorfromLine(void);
 BOOL ReadStatusofAllsensor(LineState * OutStatusSS);
 
 void ADCSensorMaincyclic(void);
+void ReadADCThreshold(	BL_AdcThres_Type *adcreadthres);
+
+uint8_t SaveADCThreshold2NVM(const BL_AdcThres_Type AdcThres);
+
+void ReadADCThresholdfromNVM(uint16_t *val2write);
 
 #endif
 
