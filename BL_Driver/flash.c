@@ -3,7 +3,7 @@
 #include "string.h"
 #include "cmsis_os.h" 
 
-#define ADCSENSORTHRES_BASE ((uint32_t)0x080E0000)
+
 
 #define ADCSENSORTHRES_REG  ((const volatile uint16_t *)ADCSENSORTHRES_BASE)
 

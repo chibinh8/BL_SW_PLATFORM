@@ -3,6 +3,7 @@
 
 #include "BL_Define.h"
 
+#define ADCSENSORTHRES_BASE ((uint32_t)0x080E0000)
 
 typedef struct{
 		__IO uint16_t blackupperthres[NumofSensor];

@@ -249,7 +249,7 @@ BOOL ReadStatusofAllsensor(LineState * OutStatusSS){
 	return FALSE;	
 }
 
-void Debouncing( void *DebouncedVal, uint16_t debouncecnt){
+void ADCSensorDebouncing( void *DebouncedVal, uint16_t debouncecnt){
 	/*to be defined later*/
 	
 }
@@ -282,20 +282,21 @@ void SensorThresCalib(void){
 
 			break;
 		case 3: //save ADC value to Flash			
-			//memset(&adcreadthres,0xCC, sizeof(BL_AdcThres_Type));
-			if((E_OK==SaveADCThreshold2NVM(adcreadthres))){
+			
+			if((E_OK==bl_fl_WriteByte2NVM((const uint8_t*)&adcreadthres.blackupperthres[0],ADCSENSORTHRES_BASE, sizeof(BL_AdcThres_Type)))){
 						bl_adc_Calibstat_u8 = 4;//default val, if saving process is not sucessfilly, try in next cycle
 						//get current time
 					  GetCurrentTimestamp(&currtime_u32);
 			}
 			break;
 		case 4 : 			
-				if(FALSE==CheckTimestampElapsed(currtime_u32, 4000)){ //1s
-					//blink LED to indicate NVM writing threshold process is done
-						HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_14);						
+				if(TRUE==CheckTimestampElapsed(currtime_u32, 4000)){ //1s
+					//blink LED to indicate NVM writing threshold process is done						
+						bl_adc_Calibstat_u8 = 255;
+				}else{
+					HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_14);
 				}
-				else
-					bl_adc_Calibstat_u8 = 255; //change to default state
+
 				break;
 		case 5: //debug only
 				memcpy(ADCSensorBlackUpperThres, &FilteredSensorVal[0], NumofSensor*sizeof(uint16_t));
@@ -303,7 +304,7 @@ void SensorThresCalib(void){
 		case 6: //debug only
 				memcpy(ADCSensorWhiteLowerThres, &FilteredSensorVal[0], NumofSensor*sizeof(uint16_t));
 				bl_adc_DataCompareThres();
-		  break;
+		    break;
 		default:
 				/*do nothing*/
 				break;
