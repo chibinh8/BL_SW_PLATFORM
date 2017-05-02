@@ -7,6 +7,12 @@
 
 #include "flash.h"
 
+#define NumofSampling 8
+#define NumOfSensor1 8
+#define NumOfSensor2 0
+#define NumofSensor (uint8_t)(NumOfSensor1+NumOfSensor2)
+#define NumOfIgnoreEle				2
+
 typedef struct{
 		__IO uint16_t blackupperthres[NumofSensor];
 		__IO uint16_t whitelowwerthres[NumofSensor];

@@ -3,6 +3,7 @@
 #include "timer.h"
 #include "dem.h"
 #include "cmsis_os.h" 
+#include <stdlib.h>
 
 ADC_HandleTypeDef hadc1;
 
@@ -32,6 +33,7 @@ LineState FinalLineSensorState[NumofSensor] = {UNDEFINE};
 static BOOL IsFilterDone = FALSE;
 static uint16_t ADCSensorBlackUpperThres[NumofSensor] = {0};
 static uint16_t ADCSensorWhiteLowerThres[NumofSensor] = {0};
+void bl_adc_SortArray(uint16_t* AdcArr);
 
 BL_AdcThres_Type adcreadthres; //Adc threshold stored value in FLASH during learning color
 
@@ -178,18 +180,24 @@ void ReadAllRawSensorfromLine(void){
 			ReadSensor(&SensorRawVal,&hadc1,SensorChannelADC1tbl[i]);
 			/*update sensor val for ring buff at index EleBuffIndex*/
 			ringbuff[i][EleBuffIndex] = SensorRawVal;
-			for(int j=0; j<NumofSampling;j++)
-					total_t += ringbuff[i][j];
-			FilteredSensorVal[i] = total_t/NumofSampling;		
+			if(EleBuffIndex==NumofSampling) {	
+				bl_adc_SortArray(&ringbuff[i][0]);
+				for(int j=NumOfIgnoreEle; j<(NumofSampling-NumOfIgnoreEle);j++)
+						total_t += ringbuff[i][j];
+				FilteredSensorVal[i] = total_t/(NumofSampling-NumOfIgnoreEle*2);	
+			}				
 	}	
 	#ifdef USEADC2
 	for(int i=0; i<NumOfSensor2; i++){
 			ReadSensor(&SensorRawVal,&hadc2,SensorChannelADC2tbl[i]);
 			/*update sensor val for ring buff at index EleBuffIndex*/
 			ringbuff[NumOfSensor1+i][EleBuffIndex] = SensorRawVal;
-			for(int j=0; j<NumofSampling;j++)
-					total_t += ringbuff[NumOfSensor1+i][j];
-			FilteredSensorVal[NumOfSensor1+i] = total_t/NumofSampling;					
+			if(EleBuffIndex==NumofSampling){	
+				bl_adc_SortArray(&ringbuff[i][0]);
+				for(int j=NumOfIgnoreEle; j<(NumofSampling-NumOfIgnoreEle);j++)
+						total_t += ringbuff[i][j];
+				FilteredSensorVal[i] = total_t/(NumofSampling-NumOfIgnoreEle*2);	
+			}					
 	}	
 	#endif
 	if(EleBuffIndex==NumofSampling) {		
@@ -395,3 +403,14 @@ void ReadADCThresholdfromNVM(uint16_t *val2write){
 	*val2write = (*ADCSENSORTHRES_REG);
 	
 }
+
+int CompareFunc(const void *a, const void *b){
+	
+	return ((*(uint16_t*)a)-(*(uint16_t*)b));
+}
+void bl_adc_SortArray(uint16_t* AdcArr){
+	
+	qsort(AdcArr, NumofSensor, sizeof(uint16_t),CompareFunc);
+	
+}
+

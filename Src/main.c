@@ -157,7 +157,7 @@ void Start10msTask(void const * argument)
   {	
 
 		ADCSensorMaincyclic();
-    osDelay(20);
+    osDelay(10);
   }
   /* USER CODE END 5 */ 
 }
