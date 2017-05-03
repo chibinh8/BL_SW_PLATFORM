@@ -1,12 +1,13 @@
 #include "flash.h"
 #include "stm32f4xx_hal_flash.h"
 #include "string.h"
-
+#include "cmsis_os.h" 
 
 
 uint8_t bl_fl_WriteByte2NVM(const uint8_t* data2write_u8, const uint32_t BaseAddress_u32, uint8_t Numofbyte){
 	uint32_t address_u32 = BaseAddress_u32;
 	HAL_StatusTypeDef RETVAL;
+	taskENTER_CRITICAL();
 	HAL_FLASH_Unlock();
 	for(uint8_t i=0; i<Numofbyte;i++)
 		{				
@@ -16,6 +17,7 @@ uint8_t bl_fl_WriteByte2NVM(const uint8_t* data2write_u8, const uint32_t BaseAdd
 			address_u32 +=1; //1 bytes
 		}	
 	HAL_FLASH_Lock();
+	taskEXIT_CRITICAL();
 	return E_OK;
 }
 

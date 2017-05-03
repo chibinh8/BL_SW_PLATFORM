@@ -103,7 +103,7 @@ int main(void)
 	 osThreadDef(UserTask, StartUserTask, osPriorityAboveNormal, 1, 128);//128*4 = 512 byte
    UserTaskTaskHandle = osThreadCreate(osThread(UserTask), NULL);	 
 	 
-	 osThreadDef(RT10msTask, Start10msTask, osPriorityAboveNormal, 1, 256);
+	 osThreadDef(RT10msTask, Start10msTask, osPriorityAboveNormal, 2, 256);
    RT10msTaskHandle = osThreadCreate(osThread(RT10msTask), NULL);
   /* USER CODE END RTOS_THREADS */
 
@@ -177,12 +177,6 @@ void StartDefaultTask(void const * argument)
   }
   /* USER CODE END 5 */ 
 }
-
-
-
-/**
-  * @}
-  */ 
 
 /**
   * @}

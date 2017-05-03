@@ -372,7 +372,7 @@
             <vShortWch>0</vShortWch>
             <VariousControls>
               <MiscControls>--C99</MiscControls>
-              <Define>USE_HAL_DRIVER,STM32F407xx,HAL_PWM_MODULE_ENABLED,UARTDEBUG</Define>
+              <Define></Define>
               <Undefine></Undefine>
               <IncludePath>../Inc;  ../Drivers/STM32F4xx_HAL_Driver/Inc; ../BL_SystemConfig;../BL_App_SDAlarm;  ../BL_Driver; ../BL_Middlewares;../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy;  ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F;  ../Middlewares/Third_Party/FreeRTOS/Source/include;  ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS;  ../Drivers/CMSIS/Include;  ../Drivers/CMSIS/Device/ST/STM32F4xx/Include</IncludePath>
             </VariousControls>
@@ -1070,6 +1070,11 @@
               <FileName>bl_rc_FollowLineRacer.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\BL_App_FollLineRacer\bl_rc_FollowLineRacer.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_hal_timebase_TIM.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\stm32f4xx_hal_timebase_TIM.c</FilePath>
             </File>
           </Files>
         </Group>

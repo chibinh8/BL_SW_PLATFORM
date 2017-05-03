@@ -4,7 +4,7 @@
 #define STM32F4XX_HAL
 #include "stm32f4xx_hal.h"
 #endif 
-
+#include "BL_SystemSWOption.h"
 #include "cmsis_os.h" 
 #include "adc.h"
 #include "uart.h"

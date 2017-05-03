@@ -19,7 +19,7 @@ ADC_HandleTypeDef hadc2;
 #define ADCSENSORTHRES ((const volatile BL_AdcThres_Type *)ADCSENSORTHRES_BASE)
 	
 #define GETBASEADDRESS(BaseAddress_u32)  ((const volatile uint8_t *)BaseAddress_u32)
-#define ADCSENSORTHRES_BASE ((uint32_t)0x080E0000)
+#define ADCSENSORTHRES_BASE ((uint32_t)0x1FFF7800)
 
 
 //ring buffer for each sensor sor will be allocated to make signal smooth
@@ -273,6 +273,7 @@ void ADCSensorDebouncing( void *DebouncedVal, uint16_t debouncecnt){
 }
 volatile uint8_t bl_adc_Calibstat_u8 = 255;
 static uint8_t NumOfByte2Flash_u8 = 0;
+uint32_t adc_currtime_u32 =0;
 /*Calibration mode*/
 void SensorThresCalib(void){
 	/*Following calibration steps should be done to get the best value for sensor
@@ -285,7 +286,7 @@ void SensorThresCalib(void){
 		3. Save threshold to flash
 	Note: bl_adc_Calibstat_u8 is changed by DiagCom request DA-02-03-[DID] with DID: state number
 	*/
-	uint32_t currtime_u32 =0;
+
 	uint32_t address_u32;
 	ReadAllRawSensorfromLine();
 	
@@ -297,21 +298,26 @@ void SensorThresCalib(void){
 			break;
 		case 2: 
 			memcpy((void*)adcreadthres.whitelowwerthres, FilteredSensorVal, NumofSensor*sizeof(uint16_t));
-			
+			GetCurrentTimestamp(&adc_currtime_u32);
 			break;
 		case 3: //save ADC value to Flash			
-			address_u32 = ADCSENSORTHRES_BASE + NumOfByte2Flash_u8;
-			if(E_OK==bl_fl_WriteByte2NVM((const uint8_t*)(&adcreadthres.blackupperthres[0]+NumOfByte2Flash_u8),address_u32,1u))
-					NumOfByte2Flash_u8++;
-			if(NumOfByte2Flash_u8==sizeof(BL_AdcThres_Type)){
+			if(TRUE==CheckTimestampElapsed(adc_currtime_u32, (uint32_t)500)){
+					address_u32 = ADCSENSORTHRES_BASE + NumOfByte2Flash_u8;
+					if(E_OK==bl_fl_WriteByte2NVM((const uint8_t*)(&adcreadthres.blackupperthres[0]+NumOfByte2Flash_u8),address_u32,1u)){
+							NumOfByte2Flash_u8++;
+					}
+					HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_14);
+					GetCurrentTimestamp(&adc_currtime_u32);
+			}
+			if(NumOfByte2Flash_u8==32){
 				bl_adc_Calibstat_u8 = 4;//default val, if saving process is not sucessfilly, try in next cycle
 				NumOfByte2Flash_u8 = 0;
 				//get current time
-				GetCurrentTimestamp(&currtime_u32);
+				GetCurrentTimestamp(&adc_currtime_u32);
 			}				
 			break;
 		case 4 : 			
-				if(TRUE==CheckTimestampElapsed(currtime_u32, 2000)){ //1s
+				if(TRUE==CheckTimestampElapsed(adc_currtime_u32, 2000)){ //1s
 					//blink LED to indicate NVM writing threshold process is done							
 						bl_adc_Calibstat_u8 = 255;
 				}else{
