@@ -3,6 +3,7 @@
 #include "string.h"
 #include "cmsis_os.h" 
 #include "dem.h"
+#include <stm32f4xx_hal_flash_ex.h>
 
 extern FaultInfor_st FlashFlt;
 
@@ -37,4 +38,19 @@ void HAL_FLASH_OperationErrorCallback(uint32_t ReturnValue){
 	FlashFlt.FaultStatus = DEM_FAIL;
 	Dem_ErrorReportStatus(&FlashFlt);
 	
+}
+
+uint8_t bl_fl_Erase_Sector(int sec_no)
+{
+	FLASH_EraseInitTypeDef er = {
+		.TypeErase = FLASH_TYPEERASE_SECTORS,
+		.Sector = sec_no,
+		.NbSectors = 1,
+		.VoltageRange = FLASH_VOLTAGE_RANGE_3
+	};
+	uint32_t fault_sec = 0;
+	HAL_FLASH_Unlock();
+	HAL_StatusTypeDef res = HAL_FLASHEx_Erase(&er, &fault_sec);
+	HAL_FLASH_Lock();
+	return res == HAL_OK ? E_OK : E_NOT_OK;
 }

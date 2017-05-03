@@ -303,10 +303,18 @@ void SensorThresCalib(void){
 		case 2: 
 			memcpy((void*)adcreadthres.whitelowwerthres, FilteredSensorVal, NumofSensor*sizeof(uint16_t));
 			GetCurrentTimestamp(&adc_currtime_u32);
-			memset(&adcreadthres,0xCC,sizeof(BL_AdcThres_Type));
+			//memset(&adcreadthres,0xDC,sizeof(BL_AdcThres_Type));
 			break;
-		case 3: //save ADC value to Flash			
-			if(TRUE==CheckTimestampElapsed(adc_currtime_u32, (uint32_t)100u)){
+		case 3: //Erase existed val in Flash		
+					taskENTER_CRITICAL();
+			    while(bl_fl_Erase_Sector(11u)!=E_OK);
+					bl_adc_Calibstat_u8 = 4;
+					GetCurrentTimestamp(&adc_currtime_u32);
+					taskEXIT_CRITICAL();
+			break;
+		case 4 : //save ADC value to Flash		
+			
+			if(TRUE==CheckTimestampElapsed(adc_currtime_u32, (uint32_t)200u)){
 					
 					address_u32 = ADCSENSORTHRES_BASE + NumOfByte2Flash_u8*2;
 					taskENTER_CRITICAL();
@@ -320,21 +328,13 @@ void SensorThresCalib(void){
 			    GetCurrentTimestamp(&adc_currtime_u32);
 			}				
 			if(NumOfByte2Flash_u8==(sizeof(BL_AdcThres_Type)>>1)){
-				bl_adc_Calibstat_u8 = 4;//default val, if saving process is not sucessfilly, try in next cycle
+				bl_adc_Calibstat_u8 = 255;//default val, if saving process is not sucessfilly, try in next cycle
 				NumOfByte2Flash_u8 = 0;
 				//get current time
 				GetCurrentTimestamp(&adc_currtime_u32);
-			}				
+			}	
+			
 			break;
-		case 4 : 			
-				if(TRUE==CheckTimestampElapsed(adc_currtime_u32, 2000)){ //1s
-					//blink LED to indicate NVM writing threshold process is done							
-						bl_adc_Calibstat_u8 = 255;
-				}else{
-					HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_14);
-				}
-
-				break;
 		case 5: //debug only
 				memcpy(ADCSensorBlackUpperThres, &FilteredSensorVal[0], NumofSensor*sizeof(uint16_t));
 				break;
