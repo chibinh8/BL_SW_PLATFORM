@@ -1,6 +1,6 @@
 #include "dem.h"
 
-
+FaultInfor_st FlashFlt;
 
 void Error_Handler(void){
 	
@@ -9,8 +9,16 @@ void Error_Handler(void){
 }
 
 
-void Dem_ErrorReportStatus(uint8_t FaultID, Errorsta_en errorsta){
+void Dem_ErrorReportStatus(FaultInfor_st* FaultReportInfor){
 	
+		if(FaultReportInfor->FaultStatus==DEM_PASS)
+		{	
+			 FaultReportInfor->FaultCnt--;
+		}else{
+			 FaultReportInfor->FaultCnt++;
+			
+		}
+		
 	
 }
 

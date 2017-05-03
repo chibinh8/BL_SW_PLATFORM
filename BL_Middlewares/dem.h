@@ -16,4 +16,14 @@ typedef enum{
 	
 }Errorsta_en;
 
+typedef struct{
+	
+	uint16_t FaultID;
+	int FaultCnt;
+	Errorsta_en FaultStatus;
+	
+}FaultInfor_st;
+
+void Dem_ErrorReportStatus(FaultInfor_st* FaultReportInfor);
+
 #endif

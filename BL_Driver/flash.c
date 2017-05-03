@@ -2,7 +2,9 @@
 #include "stm32f4xx_hal_flash.h"
 #include "string.h"
 #include "cmsis_os.h" 
+#include "dem.h"
 
+extern FaultInfor_st FlashFlt;
 
 uint8_t bl_fl_WriteByte2NVM(const uint8_t* data2write_u8, const uint32_t BaseAddress_u32, uint8_t Numofbyte){
 	uint32_t address_u32 = BaseAddress_u32;
@@ -27,4 +29,12 @@ const volatile uint8_t *ADD_REG  = ((const volatile uint8_t *)BaseAddress_u32);
 memcpy((void*)data2Read_u8, (void*)ADD_REG ,Numofbyte);
 return E_OK;
 
+}
+
+
+
+void HAL_FLASH_OperationErrorCallback(uint32_t ReturnValue){
+	FlashFlt.FaultStatus = DEM_FAIL;
+	Dem_ErrorReportStatus(&FlashFlt);
+	
 }

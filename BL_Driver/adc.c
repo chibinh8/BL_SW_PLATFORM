@@ -14,16 +14,20 @@ ADC_HandleTypeDef hadc2;
 #define BLACKOFFSET   0 
 #define WHITEOFFSET   0
 
+#define ADCSENSORTHRES_BASE 							((uint32_t)0x080E0000)
+
 #define ADCSENSORTHRES_REG  ((const volatile uint16_t *)ADCSENSORTHRES_BASE)
 
 #define ADCSENSORTHRES ((const volatile BL_AdcThres_Type *)ADCSENSORTHRES_BASE)
 	
 #define GETBASEADDRESS(BaseAddress_u32)  ((const volatile uint8_t *)BaseAddress_u32)
-#define ADCSENSORTHRES_BASE ((uint32_t)0x1FFF7800)
+	
+#define FLASH_TIMEOUT_VALUE       ((uint32_t)50000U)/* 50 s */
 
 
 //ring buffer for each sensor sor will be allocated to make signal smooth
 //there are 8 sensors
+extern FaultInfor_st FlashFlt;
 
 uint16_t ringbuff[NumofSensor][NumofSampling] = {0};
 uint16_t FilteredSensorVal[NumofSensor]={0};
@@ -299,17 +303,23 @@ void SensorThresCalib(void){
 		case 2: 
 			memcpy((void*)adcreadthres.whitelowwerthres, FilteredSensorVal, NumofSensor*sizeof(uint16_t));
 			GetCurrentTimestamp(&adc_currtime_u32);
+			memset(&adcreadthres,0xCC,sizeof(BL_AdcThres_Type));
 			break;
 		case 3: //save ADC value to Flash			
-			if(TRUE==CheckTimestampElapsed(adc_currtime_u32, (uint32_t)500)){
-					address_u32 = ADCSENSORTHRES_BASE + NumOfByte2Flash_u8;
-					if(E_OK==bl_fl_WriteByte2NVM((const uint8_t*)(&adcreadthres.blackupperthres[0]+NumOfByte2Flash_u8),address_u32,1u)){
-							NumOfByte2Flash_u8++;
-					}
+			if(TRUE==CheckTimestampElapsed(adc_currtime_u32, (uint32_t)100u)){
+					
+					address_u32 = ADCSENSORTHRES_BASE + NumOfByte2Flash_u8*2;
+					taskENTER_CRITICAL();
+					while(E_OK!=bl_fl_WriteByte2NVM((const uint8_t*)(&adcreadthres.blackupperthres[NumOfByte2Flash_u8]),address_u32,2u)){
+						 FlashFlt.FaultStatus = DEM_FAIL;
+						 Dem_ErrorReportStatus(&FlashFlt);
+					};	
+					taskEXIT_CRITICAL();
+					NumOfByte2Flash_u8 +=1;
 					HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_14);
-					GetCurrentTimestamp(&adc_currtime_u32);
-			}
-			if(NumOfByte2Flash_u8==32){
+			    GetCurrentTimestamp(&adc_currtime_u32);
+			}				
+			if(NumOfByte2Flash_u8==(sizeof(BL_AdcThres_Type)>>1)){
 				bl_adc_Calibstat_u8 = 4;//default val, if saving process is not sucessfilly, try in next cycle
 				NumOfByte2Flash_u8 = 0;
 				//get current time
