@@ -24,6 +24,7 @@ ADC_HandleTypeDef hadc2;
 	
 #define FLASH_TIMEOUT_VALUE       ((uint32_t)50000U)/* 50 s */
 
+#define DeviNum			(NumofSampling-NumOfIgnoreEle*2)
 
 //ring buffer for each sensor sor will be allocated to make signal smooth
 //there are 8 sensors
@@ -188,7 +189,7 @@ void ReadAllRawSensorfromLine(void){
 				bl_adc_SortArray(&ringbuff[i][0]);
 				for(int j=NumOfIgnoreEle; j<(NumofSampling-NumOfIgnoreEle);j++)
 						total_t += ringbuff[i][j];
-				FilteredSensorVal[i] = total_t/(NumofSampling-NumOfIgnoreEle*2);	
+				FilteredSensorVal[i] = total_t/DeviNum;	
 			}				
 	}	
 	#ifdef USEADC2
@@ -419,8 +420,7 @@ uint8_t SaveADCThreshold2NVM(const BL_AdcThres_Type AdcThres){
 }
 
 void ReadADCThresholdfromNVM(uint16_t *val2write){
-	*val2write = (*ADCSENSORTHRES_REG);
-	
+	*val2write = (*ADCSENSORTHRES_REG);	
 }
 
 int CompareFunc(const void *a, const void *b){
