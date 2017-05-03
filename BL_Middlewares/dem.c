@@ -2,9 +2,11 @@
 
 FaultInfor_st FlashFlt;
 
+int16_t TotalFaultOccured_u16 = 0;
+
 void Error_Handler(void){
 	
-	HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_13);
+		TotalFaultOccured_u16++;
 	
 }
 
