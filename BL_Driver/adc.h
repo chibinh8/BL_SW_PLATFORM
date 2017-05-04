@@ -49,5 +49,6 @@ uint8_t SaveADCThreshold2NVM(const BL_AdcThres_Type AdcThres);
 
 void ReadADCThresholdfromNVM(uint16_t *val2write);
 
+
 #endif
 

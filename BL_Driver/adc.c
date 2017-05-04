@@ -4,8 +4,10 @@
 #include "dem.h"
 #include "cmsis_os.h" 
 #include <stdlib.h>
+#include "dma.h"
 
 ADC_HandleTypeDef hadc1;
+
 
 #ifdef USEADC2
 ADC_HandleTypeDef hadc2;
@@ -41,6 +43,7 @@ static uint16_t ADCSensorWhiteLowerThres[NumofSensor] = {0};
 void bl_adc_SortArray(uint16_t* AdcArr);
 
 BL_AdcThres_Type adcreadthres; //Adc threshold stored value in FLASH during learning color
+BOOL bl_adc_SeqADConverIsComplt;
 
 static void MX_ADC1_Init(void);
 #ifdef USEADC2
@@ -75,8 +78,16 @@ static void InitRingbuffsensor(void){
 void BL_ADCInit(void){
 	BL_AdcThres_Type adcthres_t;
 	ADCSensorRunmode = CYCLIC;
+	#ifdef ADC_DMA
+	MX_DMA_Init();
+	#endif
 	MX_ADC1_Init(); //configure ADC 1,2 
-	HAL_ADC_Start(&hadc1);
+	if(HAL_ADC_Start(&hadc1)!=HAL_OK){
+		Error_Handler();
+	}
+	if(HAL_ADC_Start_DMA(&hadc1,(uint32_t*)FilteredSensorVal,NumofSensor)!=HAL_OK){
+			Error_Handler();
+	}
 	#ifdef USEADC2
 	MX_ADC2_Init();
 	HAL_ADC_Start(&hadc2);
@@ -90,6 +101,7 @@ void BL_ADCInit(void){
 
 }
 
+#ifndef ADC_DMA
 /* ADC1 init function */
 static void MX_ADC1_Init(void)
 {
@@ -109,7 +121,7 @@ static void MX_ADC1_Init(void)
   hadc1.Init.DataAlign = ADC_DATAALIGN_RIGHT;
   hadc1.Init.NbrOfConversion = 1;
   hadc1.Init.DMAContinuousRequests = DISABLE;
-  hadc1.Init.EOCSelection = ADC_EOC_SINGLE_CONV;
+  hadc1.Init.EOCSelection = ADC_EOC_SEQ_CONV;
   if (HAL_ADC_Init(&hadc1) != HAL_OK)
   {
     Error_Handler();
@@ -126,6 +138,109 @@ static void MX_ADC1_Init(void)
   }
 
 }
+#else
+/* ADC1 init function */
+static void MX_ADC1_Init(void)
+{
+
+  ADC_ChannelConfTypeDef sConfig;
+
+    /**Configure the global features of the ADC (Clock, Resolution, Data Alignment and number of conversion) 
+    */
+  hadc1.Instance = ADC1;
+  hadc1.Init.ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV4;
+  hadc1.Init.Resolution = ADC_RESOLUTION_12B;
+  hadc1.Init.ScanConvMode = ENABLE;
+  hadc1.Init.ContinuousConvMode = ENABLE;
+  hadc1.Init.DiscontinuousConvMode = DISABLE;
+  hadc1.Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_RISINGFALLING;
+  hadc1.Init.ExternalTrigConv = ADC_EXTERNALTRIGCONV_T1_CC1;
+  hadc1.Init.DataAlign = ADC_DATAALIGN_RIGHT;
+  hadc1.Init.NbrOfConversion = 8;
+  hadc1.Init.DMAContinuousRequests = ENABLE;
+  hadc1.Init.EOCSelection = ADC_EOC_SINGLE_CONV;
+  if (HAL_ADC_Init(&hadc1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+    /**Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time. 
+    */
+  sConfig.Channel = ADC_CHANNEL_1;
+  sConfig.Rank = 1;
+  sConfig.SamplingTime = ADC_SAMPLETIME_3CYCLES;
+  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+    /**Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time. 
+    */
+  sConfig.Channel = ADC_CHANNEL_8;
+  sConfig.Rank = 2;
+  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+    /**Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time. 
+    */
+  sConfig.Channel = ADC_CHANNEL_9;
+  sConfig.Rank = 3;
+  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+    /**Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time. 
+    */
+  sConfig.Channel = ADC_CHANNEL_10;
+  sConfig.Rank = 4;
+  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+    /**Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time. 
+    */
+  sConfig.Channel = ADC_CHANNEL_11;
+  sConfig.Rank = 5;
+  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+    /**Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time. 
+    */
+  sConfig.Channel = ADC_CHANNEL_12;
+  sConfig.Rank = 6;
+  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+    /**Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time. 
+    */
+  sConfig.Channel = ADC_CHANNEL_14;
+  sConfig.Rank = 7;
+  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+    /**Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time. 
+    */
+  sConfig.Channel = ADC_CHANNEL_15;
+  sConfig.Rank = 8;
+  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+}
+
+#endif
+
 #ifdef USEADC2
 /* ADC2 init function */
 static void MX_ADC2_Init(void)
@@ -178,13 +293,25 @@ void ReadSensor(volatile uint16_t* outsensorval, ADC_HandleTypeDef *hadc, uint8_
 	 *outsensorval = (uint16_t)(tempsensor&0x0FFF);	 
 }
 
+void ReadSensorValWithDMA(volatile uint16_t* outsensorval, ADC_HandleTypeDef *hadc){
+		if(bl_adc_SeqADConverIsComplt==TRUE){
+			
+			bl_adc_SeqADConverIsComplt = FALSE;
+		}
+				
+}
+
 /*Run in task 50 ms*/
 
 void ReadAllRawSensorfromLine(void){
 	uint16_t SensorRawVal;
 	uint32_t total_t=0;
 	for(int i=0; i<NumOfSensor1; i++){
-			ReadSensor(&SensorRawVal,&hadc1,SensorChannelADC1tbl[i]);
+			#ifdef ADC_DMA
+				ReadSensorValWithDMA(&SensorRawVal,&hadc1);
+			#else
+				ReadSensor(&SensorRawVal,&hadc1,SensorChannelADC1tbl[i]);	
+			#endif
 			/*update sensor val for ring buff at index EleBuffIndex*/
 			ringbuff[i][EleBuffIndex] = SensorRawVal;
 			if(EleBuffIndex==(NumofSampling-1)) {	
@@ -196,7 +323,11 @@ void ReadAllRawSensorfromLine(void){
 	}	
 	#ifdef USEADC2
 	for(int i=0; i<NumOfSensor2; i++){
-			ReadSensor(&SensorRawVal,&hadc2,SensorChannelADC2tbl[i]);
+			#ifdef ADC_DMA
+				ReadSensorValWithDMA(&SensorRawVal,&hadc1);
+			#else
+				ReadSensor(&SensorRawVal,&hadc1,SensorChannelADC1tbl[i]);	
+			#endif
 			/*update sensor val for ring buff at index EleBuffIndex*/
 			ringbuff[NumOfSensor1+i][EleBuffIndex] = SensorRawVal;
 			if(EleBuffIndex==(NumofSampling-1)){	
@@ -434,4 +565,9 @@ void bl_adc_SortArray(uint16_t* AdcArr){
 	qsort(AdcArr, NumofSensor, sizeof(uint16_t),CompareFunc);
 	
 }
-
+/*Callback function once ADC convertion is complete*/
+void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc){
+			
+	 ;
+	
+}
