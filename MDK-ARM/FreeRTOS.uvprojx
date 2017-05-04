@@ -942,6 +942,11 @@
               <FileType>1</FileType>
               <FilePath>..\BL_Driver\BL_Ds1307.c</FilePath>
             </File>
+            <File>
+              <FileName>dma.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\BL_Driver\dma.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
