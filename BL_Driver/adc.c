@@ -56,7 +56,8 @@ static void MX_ADC2_Init(void);
     PB0     ------> ADC1_IN8
     PB1     ------> ADC1_IN9 
 */
-const uint32_t SensorChannelADC1tbl[NumOfSensor1] = { ADC_CHANNEL_8, ADC_CHANNEL_11, ADC_CHANNEL_12, ADC_CHANNEL_1, ADC_CHANNEL_10, ADC_CHANNEL_9, ADC_CHANNEL_14, ADC_CHANNEL_15};
+const uint32_t SensorChannelADC1tbl[NumOfSensor1] = { ADC_CHANNEL_8, ADC_CHANNEL_11, ADC_CHANNEL_12,ADC_CHANNEL_1, ADC_CHANNEL_10, ADC_CHANNEL_9, ADC_CHANNEL_14, ADC_CHANNEL_15};
+//const uint32_t SensorChannelADC1tbl[NumOfSensor1] = { ADC_CHANNEL_8,ADC_CHANNEL_12, ADC_CHANNEL_1, ADC_CHANNEL_10, ADC_CHANNEL_9, ADC_CHANNEL_14, ADC_CHANNEL_15};
 #ifdef USEADC2
 const uint32_t SensorChannelADC2tbl[NumOfSensor2] = {0};
 #endif
@@ -66,7 +67,7 @@ void bl_adc_DataCompareThres(void);
 
 static void InitRingbuffsensor(void){
 		memset((uint16_t*)ringbuff, 0, (uint8_t)(NumofSampling*NumofSensor*sizeof(uint16_t)));
-		memset((uint16_t*)FilteredSensorVal, 0, NumofSensor*2);
+		memset((uint16_t*)FilteredSensorVal, 0, NumofSensor*sizeof(uint16_t));
 		memset((uint16_t*)adcreadthres.blackupperthres, 0, NumofSensor*sizeof(uint16_t));
 		memset((uint16_t*)adcreadthres.whitelowwerthres, 0, NumofSensor*sizeof(uint16_t));
 }
@@ -170,6 +171,7 @@ void ReadSensor(volatile uint16_t* outsensorval, ADC_HandleTypeDef *hadc, uint8_
 	   tempsensor = HAL_ADC_GetValue(hadc);
 		 
 	 }else{
+		 Error_Handler();
 		 tempsensor = 0u;
 	 }
 
@@ -180,16 +182,16 @@ void ReadSensor(volatile uint16_t* outsensorval, ADC_HandleTypeDef *hadc, uint8_
 
 void ReadAllRawSensorfromLine(void){
 	uint16_t SensorRawVal;
-	uint16_t total_t=0;
+	uint32_t total_t=0;
 	for(int i=0; i<NumOfSensor1; i++){
 			ReadSensor(&SensorRawVal,&hadc1,SensorChannelADC1tbl[i]);
 			/*update sensor val for ring buff at index EleBuffIndex*/
 			ringbuff[i][EleBuffIndex] = SensorRawVal;
-			if(EleBuffIndex==NumofSampling) {	
+			if(EleBuffIndex==(NumofSampling-1)) {	
 				bl_adc_SortArray(&ringbuff[i][0]);
 				for(int j=NumOfIgnoreEle; j<(NumofSampling-NumOfIgnoreEle);j++)
 						total_t += ringbuff[i][j];
-				FilteredSensorVal[i] = total_t/DeviNum;	
+				FilteredSensorVal[i] = (uint16_t)(total_t/DeviNum);	
 			}				
 	}	
 	#ifdef USEADC2
@@ -197,7 +199,7 @@ void ReadAllRawSensorfromLine(void){
 			ReadSensor(&SensorRawVal,&hadc2,SensorChannelADC2tbl[i]);
 			/*update sensor val for ring buff at index EleBuffIndex*/
 			ringbuff[NumOfSensor1+i][EleBuffIndex] = SensorRawVal;
-			if(EleBuffIndex==NumofSampling){	
+			if(EleBuffIndex==(NumofSampling-1)){	
 				bl_adc_SortArray(&ringbuff[i][0]);
 				for(int j=NumOfIgnoreEle; j<(NumofSampling-NumOfIgnoreEle);j++)
 						total_t += ringbuff[i][j];
@@ -205,7 +207,7 @@ void ReadAllRawSensorfromLine(void){
 			}					
 	}	
 	#endif
-	if(EleBuffIndex==NumofSampling) {		
+	if(EleBuffIndex==(NumofSampling-1)) {		
 		IsFilterDone = TRUE; //reading is ok only if it's already sampled 4 times
 		EleBuffIndex = 0; //reset buffer index
 	}else{
