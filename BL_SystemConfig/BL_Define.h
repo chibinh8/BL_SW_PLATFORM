@@ -29,6 +29,17 @@ typedef enum{
 	E_NOT_OK,	
 	E_OK
 }retstate;
+
+
+typedef enum{
+		UINT8,
+		SINT8,
+		UINT16,
+		SINT16,
+		STRING,
+		CHAR,	
+}Datatype_en;
+
 #endif 
 
 #endif

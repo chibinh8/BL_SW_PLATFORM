@@ -12,6 +12,7 @@
 #define NumOfSensor2 0
 #define NumofSensor (uint8_t)(NumOfSensor1+NumOfSensor2)
 #define NumOfIgnoreEle				2
+#define ADCSENSORTHRES_BASE 							((uint32_t)0x080E0000)
 
 typedef struct{
 		__IO uint16_t blackupperthres[NumofSensor];

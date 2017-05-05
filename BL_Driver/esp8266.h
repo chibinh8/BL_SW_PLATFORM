@@ -31,12 +31,6 @@ typedef struct{
 	
 }ESPMessage_st;
 
-typedef enum{
-		UINT8,
-		SINT8,
-		STRING,
-		CHAR,	
-}Datatype_en;
 
 typedef struct{
 			Datatype_en  Datatype;

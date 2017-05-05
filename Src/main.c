@@ -154,7 +154,8 @@ void StartBackgroundTask(void const * argument)
 
 			ESPOperationCyclic();
 			bl_al_AlarmCyclic();
-			ProcessDiagserviceCyclicMain();			
+			ProcessDiagserviceCyclicMain();		
+			bl_fl_NVMOperationCyclic();
 			osDelay(100);
 		}
 }

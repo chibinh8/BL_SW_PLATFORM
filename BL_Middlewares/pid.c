@@ -11,21 +11,6 @@
 void bl_adc_GetFinalSensorSta(LineState *FinalLineSensorSta);
 int16_t bl_pid_DeviationCal(void);
 
-typedef struct{
-	
-float KP_fl;
-float KI_fl;
-float KD_fl;
-
-}PIDInfor_st;
-
-
-typedef enum{
-IDLE,
-TUNINGPID,
-NORMALCONTROL,
-	
-}PIDWorkSta_en;
 
 
 #define SensorWeight   10u
@@ -37,7 +22,7 @@ NORMALCONTROL,
 
 int16_t bl_pid_SensorFactor[NumofSensor] = {4,3,2,1,1,-2,-3,-4};
 
-PIDInfor_st bl_PIDInfor_st = {0.0f};
+PIDInfor_st bl_PIDInfor_st = {1.0f, 2.0f, 0.0f};
 PIDInfor_st PIDValCal_st;
 int16_t bl_pid_LastErrorPID_i16 = 0;
 int16_t bl_pid_ErrorPID_i16;

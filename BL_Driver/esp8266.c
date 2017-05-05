@@ -1,3 +1,4 @@
+#include "BL_Define.h"
 #include "esp8266.h"
 #include "uart.h"
 #include "string.h"
@@ -6,6 +7,7 @@
 #include "dem.h"
 #include "ECUModeManager.h"
 #include "flash.h"
+
 
 #define ESPErrorMaxcnt 10
 #define GPIOPINESPRESET GPIO_PIN_12

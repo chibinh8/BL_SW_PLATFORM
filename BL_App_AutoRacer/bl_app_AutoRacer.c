@@ -4,7 +4,7 @@
 
 typedef enum{
 	
-	IDLE,
+	RC_IDLE,
 	FOLLOWLINE,
 	RIGHTSTEERING,
 	LEFTSTEERING,
@@ -17,12 +17,12 @@ typedef enum{
 RacerPatternSta_en bl_app_SituationAnalysis(void){
 	
 	
-	return IDLE;
+	return RC_IDLE;
 }
 
-RacerPatternSta_en bl_app_RacerPatternWorkStat_en  = IDLE;
+RacerPatternSta_en bl_app_RacerPatternWorkStat_en  = RC_IDLE;
 void bl_app_AutoRacerInit(void){
-	bl_app_RacerPatternWorkStat_en = IDLE;
+	bl_app_RacerPatternWorkStat_en = RC_IDLE;
 	
 }
 void bl_app_AutoRacerCyclic(void){

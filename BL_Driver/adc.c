@@ -17,7 +17,6 @@ ADC_HandleTypeDef hadc2;
 #define BLACKOFFSET   0 
 #define WHITEOFFSET   0
 
-#define ADCSENSORTHRES_BASE 							((uint32_t)0x080E0000)
 
 #define ADCSENSORTHRES_REG  ((const volatile uint16_t *)ADCSENSORTHRES_BASE)
 
@@ -386,34 +385,15 @@ void SensorThresCalib(void){
 			//memset(&adcreadthres,0xDC,sizeof(BL_AdcThres_Type));
 			break;
 		case 3: //Erase existed val in Flash		
-					taskENTER_CRITICAL();
-			    while(bl_fl_Erase_Sector(11u)!=E_OK);
-					bl_adc_Calibstat_u8 = 4;
-					GetCurrentTimestamp(&adc_currtime_u32);
-					taskEXIT_CRITICAL();
+			bl_fl_UserTriggerNVMAction(BL_STARTWRITING, 11u);
+			bl_adc_Calibstat_u8 = 4;
 			break;
 		case 4 : //save ADC value to Flash		
 			
-			if(TRUE==CheckTimestampElapsed(adc_currtime_u32, (uint32_t)200u)){
-					
-					address_u32 = ADCSENSORTHRES_BASE + NumOfByte2Flash_u8*2;
-					taskENTER_CRITICAL();
-					while(E_OK!=bl_fl_WriteByte2NVM((const uint8_t*)(&adcreadthres.blackupperthres[NumOfByte2Flash_u8]),address_u32,2u)){
-						 FlashFlt.FaultStatus = DEM_FAIL;
-						 Dem_ErrorReportStatus(&FlashFlt);
-					};	
-					taskEXIT_CRITICAL();
-					NumOfByte2Flash_u8 +=1;
-					HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_14);
-			    GetCurrentTimestamp(&adc_currtime_u32);
-			}				
-			if(NumOfByte2Flash_u8==(sizeof(BL_AdcThres_Type)>>1)){
-				bl_adc_Calibstat_u8 = 255;//default val, if saving process is not sucessfilly, try in next cycle
-				NumOfByte2Flash_u8 = 0;
-				//get current time
-				GetCurrentTimestamp(&adc_currtime_u32);
-			}	
-			
+			if(bl_fl_GetNVMJobSta()==BL_IDLE)
+					bl_adc_Calibstat_u8 = 255;
+			else if(bl_fl_GetNVMJobSta()==BL_ERROR)
+					bl_adc_Calibstat_u8 = 255;
 			break;
 		case 5: //debug only
 				memcpy(ADCSensorBlackUpperThres, &FilteredSensorVal[0], NumofSensor*sizeof(uint16_t));
