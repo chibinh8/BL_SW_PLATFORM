@@ -83,8 +83,9 @@ void bl_fl_NVMOperationCyclic(void){
 				
 			break;
 		case BL_WRITING:
-				
+				// check in config table, if the current element belongs to sector then write the corresponding data to NVM
 			break;
+		
 		default:
 			
 			break;
