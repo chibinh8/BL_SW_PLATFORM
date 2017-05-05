@@ -55,7 +55,7 @@
 
 
 
-osThreadId defaultTaskHandle, UserTaskTaskHandle, RTRealTimeTaskHandle;
+osThreadId defaultTaskHandle, BackgroundTaskTaskHandle, RTRealTimeTaskHandle;
 				
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
@@ -66,7 +66,7 @@ osThreadId defaultTaskHandle, UserTaskTaskHandle, RTRealTimeTaskHandle;
 
 
 void StartDefaultTask(void const * argument);
-void StartUserTask(void const * argument);
+void StartBackgroundTask(void const * argument);
 void StartRealtimeTask(void const * argument);
 
 
@@ -111,8 +111,8 @@ int main(void)
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
-	 osThreadDef(UserTask, StartUserTask, osPriorityAboveNormal, 1, 128);//128*4 = 512 byte
-   UserTaskTaskHandle = osThreadCreate(osThread(UserTask), NULL);	 
+	 osThreadDef(BackgroundTask, StartBackgroundTask, osPriorityAboveNormal, 1, 128);//128*4 = 512 byte
+   BackgroundTaskTaskHandle = osThreadCreate(osThread(BackgroundTask), NULL);	 
 	 
 	 osThreadDef(RTRealTimeTask, StartRealtimeTask, osPriorityAboveNormal, 2, 256);
    RTRealTimeTaskHandle = osThreadCreate(osThread(RTRealTimeTask), NULL);
@@ -143,7 +143,7 @@ int main(void)
 
 /* USER CODE BEGIN 4 */
 
-void StartUserTask(void const * argument)
+void StartBackgroundTask(void const * argument)
 {
   /* USER CODE BEGIN 5 */
 	
