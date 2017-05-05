@@ -8,6 +8,7 @@
 
 ADC_HandleTypeDef hadc1;
 
+#define ADC_DMA
 
 #ifdef USEADC2
 ADC_HandleTypeDef hadc2;
@@ -102,6 +103,7 @@ void BL_ADCInit(void){
 }
 
 #ifndef ADC_DMA
+
 /* ADC1 init function */
 static void MX_ADC1_Init(void)
 {
@@ -139,6 +141,17 @@ static void MX_ADC1_Init(void)
 
 }
 #else
+
+static void SubADCChannelInit(const uint32_t SensorChannel,uint8_t Rank, ADC_HandleTypeDef* hadc, ADC_ChannelConfTypeDef* sConfig){
+	
+	sConfig->Channel = SensorChannel;
+  sConfig->Rank = Rank;
+  sConfig->SamplingTime = ADC_SAMPLETIME_3CYCLES;
+  if (HAL_ADC_ConfigChannel(hadc, sConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+}
 /* ADC1 init function */
 static void MX_ADC1_Init(void)
 {
@@ -166,76 +179,9 @@ static void MX_ADC1_Init(void)
 
     /**Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time. 
     */
-  sConfig.Channel = ADC_CHANNEL_1;
-  sConfig.Rank = 1;
-  sConfig.SamplingTime = ADC_SAMPLETIME_3CYCLES;
-  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
-  {
-    Error_Handler();
-  }
-
-    /**Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time. 
-    */
-  sConfig.Channel = ADC_CHANNEL_8;
-  sConfig.Rank = 2;
-  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
-  {
-    Error_Handler();
-  }
-
-    /**Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time. 
-    */
-  sConfig.Channel = ADC_CHANNEL_9;
-  sConfig.Rank = 3;
-  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
-  {
-    Error_Handler();
-  }
-
-    /**Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time. 
-    */
-  sConfig.Channel = ADC_CHANNEL_10;
-  sConfig.Rank = 4;
-  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
-  {
-    Error_Handler();
-  }
-
-    /**Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time. 
-    */
-  sConfig.Channel = ADC_CHANNEL_11;
-  sConfig.Rank = 5;
-  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
-  {
-    Error_Handler();
-  }
-
-    /**Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time. 
-    */
-  sConfig.Channel = ADC_CHANNEL_12;
-  sConfig.Rank = 6;
-  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
-  {
-    Error_Handler();
-  }
-
-    /**Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time. 
-    */
-  sConfig.Channel = ADC_CHANNEL_14;
-  sConfig.Rank = 7;
-  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
-  {
-    Error_Handler();
-  }
-
-    /**Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time. 
-    */
-  sConfig.Channel = ADC_CHANNEL_15;
-  sConfig.Rank = 8;
-  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
-  {
-    Error_Handler();
-  }
+	for(uint8_t LoopIndex = 0;LoopIndex< NumOfSensor1; LoopIndex++){
+		SubADCChannelInit(SensorChannelADC1tbl[LoopIndex],(LoopIndex+1),&hadc1, &sConfig);
+	}
 
 }
 
@@ -293,34 +239,36 @@ void ReadSensor(volatile uint16_t* outsensorval, ADC_HandleTypeDef *hadc, uint8_
 	 *outsensorval = (uint16_t)(tempsensor&0x0FFF);	 
 }
 
-void ReadSensorValWithDMA(volatile uint16_t* outsensorval, ADC_HandleTypeDef *hadc){
+void ReadSensorValWithDMA(const uint8_t BuffIndex,const uint8_t SampleIndex){
 		if(bl_adc_SeqADConverIsComplt==TRUE){
-			
-			bl_adc_SeqADConverIsComplt = FALSE;
-		}
-				
+			for(uint8_t LoopIndex = 0; LoopIndex<NumOfSensor1; LoopIndex++){
+				ringbuff[LoopIndex][BuffIndex] = FilteredSensorVal[LoopIndex];
+			}
+		 bl_adc_SeqADConverIsComplt = FALSE;
+		}		
 }
 
 /*Run in task 50 ms*/
 
 void ReadAllRawSensorfromLine(void){
+	uint32_t total_t=0;	
 	uint16_t SensorRawVal;
-	uint32_t total_t=0;
 	for(int i=0; i<NumOfSensor1; i++){
-			#ifdef ADC_DMA
-				ReadSensorValWithDMA(&SensorRawVal,&hadc1);
-			#else
-				ReadSensor(&SensorRawVal,&hadc1,SensorChannelADC1tbl[i]);	
-			#endif
+			#ifndef ADC_DMA
+			ReadSensor(&SensorRawVal,&hadc1,SensorChannelADC1tbl[i]);	
 			/*update sensor val for ring buff at index EleBuffIndex*/
 			ringbuff[i][EleBuffIndex] = SensorRawVal;
+			#else
+			ReadSensorValWithDMA(i,EleBuffIndex);
+			#endif
 			if(EleBuffIndex==(NumofSampling-1)) {	
 				bl_adc_SortArray(&ringbuff[i][0]);
 				for(int j=NumOfIgnoreEle; j<(NumofSampling-NumOfIgnoreEle);j++)
 						total_t += ringbuff[i][j];
 				FilteredSensorVal[i] = (uint16_t)(total_t/DeviNum);	
 			}				
-	}	
+	}
+	
 	#ifdef USEADC2
 	for(int i=0; i<NumOfSensor2; i++){
 			#ifdef ADC_DMA
@@ -567,7 +515,7 @@ void bl_adc_SortArray(uint16_t* AdcArr){
 }
 /*Callback function once ADC convertion is complete*/
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc){
-			
-	 ;
+	
+				bl_adc_SeqADConverIsComplt = TRUE;
 	
 }
