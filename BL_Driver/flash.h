@@ -3,6 +3,18 @@
 
 #include "BL_Define.h"
 
+typedef enum{
+	
+	BL_IDLE,
+	BL_BUSY,
+	BL_STARTWRITING,
+	BL_ERASING,
+	BL_WRITING,
+	BL_WRITEDONE,
+	BL_ERROR,
+	
+}NVMJobSta_en;
+
 
 uint8_t bl_fl_WriteByte2NVM(const uint8_t* data2write_u8, const uint32_t BaseAddress_u32, uint8_t Numofbyte);
 

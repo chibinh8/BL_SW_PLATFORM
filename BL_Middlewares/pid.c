@@ -1,6 +1,7 @@
 #include "pid.h"
 #include "adc.h"
 #include "pwm.h"
+#include "timer.h"
 
 #ifdef USE_ARMMATH
 /* Include ARM math */
@@ -43,6 +44,8 @@ int16_t bl_pid_ErrorPID_i16;
 int16_t bl_pid_RC_AngComValOut_u16;
 float bl_pid_ControlPIDVal_fl;
 PIDWorkSta_en bl_pid_PIDJobSta_en = IDLE;
+
+static uint8_t bl_pid_PIDTuningSubSta_u8 =0;
 
 /* ARM PID Instance, float_32 format */
 #ifdef USE_ARMMATH
@@ -127,13 +130,27 @@ int16_t bl_pid_DeviationCal(void){
 }
 
 void bl_pid_FollowLineContrWithPIDCyclic(void){
-		
+		static uint32_t bl_pid_currtime_u32 = 0;
 		switch(bl_pid_PIDJobSta_en){
 			case IDLE:
 				
 				break;
 			case TUNINGPID:
-				bl_pid_PIDTuning();
+				switch(bl_pid_PIDTuningSubSta_u8){
+					
+					case 0: 
+						bl_pid_PIDTuning();
+						(void)bl_pid_RCAngCal();
+						bl_pid_ActionAfterPIDCtrl(bl_pid_RC_AngComValOut_u16);
+						GetCurrentTimestamp(&bl_pid_currtime_u32);
+						break;
+					case 1: //Erase NVM 
+						if(TRUE==CheckTimestampElapsed(bl_pid_currtime_u32, (uint32_t)200u)){
+								
+						}
+						break;
+				}
+
 			
 				break;
 			case NORMALCONTROL:
@@ -146,6 +163,8 @@ void bl_pid_FollowLineContrWithPIDCyclic(void){
 			
 		}
 }
+
+
 
 uint16_t bl_pid_GetRCContrVal(void){
 	return bl_pid_RC_AngComValOut_u16;
