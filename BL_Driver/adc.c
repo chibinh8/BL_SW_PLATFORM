@@ -241,12 +241,10 @@ void ReadSensor(volatile uint16_t* outsensorval, ADC_HandleTypeDef *hadc, uint8_
 
 void ReadSensorValWithDMA(const uint8_t BuffIndex,const uint8_t SampleIndex){
 		if(bl_adc_SeqADConverIsComplt==TRUE){
-			for(uint8_t LoopIndex = 0; LoopIndex<NumOfSensor1; LoopIndex++){
-				ringbuff[LoopIndex][BuffIndex] = FilteredSensorVal[LoopIndex];
-			}
-		 bl_adc_SeqADConverIsComplt = FALSE;
-		}		
-}
+				ringbuff[BuffIndex][SampleIndex] = FilteredSensorVal[BuffIndex];
+			}		 bl_adc_SeqADConverIsComplt = FALSE;
+}		
+
 
 /*Run in task 50 ms*/
 
@@ -271,20 +269,20 @@ void ReadAllRawSensorfromLine(void){
 	
 	#ifdef USEADC2
 	for(int i=0; i<NumOfSensor2; i++){
-			#ifdef ADC_DMA
-				ReadSensorValWithDMA(&SensorRawVal,&hadc1);
-			#else
-				ReadSensor(&SensorRawVal,&hadc1,SensorChannelADC1tbl[i]);	
-			#endif
+			#ifndef ADC_DMA
+			ReadSensor(&SensorRawVal,&hadc2,SensorChannelADC2tbl[i]);	
 			/*update sensor val for ring buff at index EleBuffIndex*/
-			ringbuff[NumOfSensor1+i][EleBuffIndex] = SensorRawVal;
-			if(EleBuffIndex==(NumofSampling-1)){	
+			ringbuff[i][EleBuffIndex] = SensorRawVal;
+			#else
+			ReadSensorValWithDMA(i,EleBuffIndex);
+			#endif
+			if(EleBuffIndex==(NumofSampling-1)) {	
 				bl_adc_SortArray(&ringbuff[i][0]);
 				for(int j=NumOfIgnoreEle; j<(NumofSampling-NumOfIgnoreEle);j++)
 						total_t += ringbuff[i][j];
-				FilteredSensorVal[i] = total_t/(NumofSampling-NumOfIgnoreEle*2);	
-			}					
-	}	
+				FilteredSensorVal[i] = (uint16_t)(total_t/DeviNum);	
+			}				
+	}
 	#endif
 	if(EleBuffIndex==(NumofSampling-1)) {		
 		IsFilterDone = TRUE; //reading is ok only if it's already sampled 4 times
