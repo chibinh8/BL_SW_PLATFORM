@@ -3,7 +3,7 @@
 
 #include "BL_Define.h"
 
-#define NUMBEROFDATASECTOR    2
+#define NUMBEROFDATASECTOR    3
 
 typedef enum{
 	
@@ -19,7 +19,7 @@ typedef enum{
 
 typedef struct{
 uint32_t NVMAddress_u32;
-void *Data;
+void* Data;
 uint8_t SectorNum_u8;
 uint8_t DatatypeLen;
 uint8_t size;	
@@ -33,7 +33,7 @@ uint8_t SectorNum_u8;
 }DataWriteJob_st;
 
 
-uint8_t bl_fl_WriteByte2NVM(const uint8_t* data2write_u8, const uint32_t BaseAddress_u32, uint8_t Numofbyte);
+uint8_t bl_fl_WriteByte2NVM(volatile uint8_t* data2write_u8, const uint32_t BaseAddress_u32, uint8_t Numofbyte);
 
 uint8_t bl_fl_ReadbytefromNVM(uint8_t* data2Read_u8, const uint32_t BaseAddress_u32, uint8_t Numofbyte);
 

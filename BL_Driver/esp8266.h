@@ -10,6 +10,9 @@
 #define SSID    "BLPRO"
 #define PASS		"123456"
 
+#define ESPBASEADDR   ((uint32_t)0x080E0030)
+#define ESPCONFINFOR_AU8 ((const volatile uint8_t) *ESPBASEADDR)
+	
 typedef enum{
 	
 	WAITINGRES,

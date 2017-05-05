@@ -21,7 +21,7 @@ DataWriteJob_st bl_fl_DataWriteJob_st;
 uint32_t bl_fl_currtime_u32;
 uint32_t bl_fl_Wiringtime_u32;
 
-uint8_t bl_fl_WriteByte2NVM(const uint8_t* data2write_u8, const uint32_t BaseAddress_u32, uint8_t Numofbyte){
+uint8_t bl_fl_WriteByte2NVM(volatile uint8_t* data2write_u8, const uint32_t BaseAddress_u32, uint8_t Numofbyte){
 	uint32_t address_u32 = BaseAddress_u32;
 	HAL_StatusTypeDef RETVAL;
 	taskENTER_CRITICAL();
@@ -81,11 +81,12 @@ void bl_fl_WriteChunkofData2SectorNVM(void){
 	
 			uint32_t address_u32;
 			uint8_t Multifactor_u8;
-	
+			uint8_t WriEleIndex;
 			Multifactor_u8 = bl_fl_DataInSector_pu8[bl_flDataSectorIndex_u8].DatatypeLen;
+			WriEleIndex =  bl_fl_NumOfByte2Flash_u8*Multifactor_u8;
 			address_u32 = bl_fl_DataInSector_pu8[bl_flDataSectorIndex_u8].NVMAddress_u32 + bl_fl_NumOfByte2Flash_u8*Multifactor_u8;
 			taskENTER_CRITICAL();
-			while(E_OK!=bl_fl_WriteByte2NVM((const uint8_t*)(bl_fl_DataInSector_pu8[bl_flDataSectorIndex_u8].Data),address_u32,Multifactor_u8)){
+			while(E_OK!=bl_fl_WriteByte2NVM(((uint8_t*)bl_fl_DataInSector_pu8[bl_flDataSectorIndex_u8].Data+WriEleIndex),address_u32,Multifactor_u8)){
 						 FlashFlt.FaultStatus = DEM_FAIL;
 						 Dem_ErrorReportStatus(&FlashFlt);
 					};	
