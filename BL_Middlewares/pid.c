@@ -20,7 +20,7 @@ int16_t bl_pid_DeviationCal(void);
 #define KD_SAMPLERATE									500u //TASK is run in 5 ms 
 #define SENSORPOS2ANGLEDUTYFAC				2.0f
 
-int16_t bl_pid_SensorFactor[NumofSensor] = {4,3,2,1,1,-2,-3,-4};
+int16_t bl_pid_SensorFactor[NumofSensor] = {4,3,2,1,-1,-2,-3,-4};
 
 PIDInfor_st bl_PIDInfor_st = {1.0f, 2.0f, 0.0f};
 PIDInfor_st PIDValCal_st;
