@@ -69,7 +69,10 @@ void InitRCServo(void){
 	HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1);
 }
 
-
+uint16_t bl_pwm_Angle2DutyConv(uint8_t Angle){
+	return (uint16_t)(Angle*1679/90);
+}
+	
 /* htim3.Init.Period = 1679
 RC servo angle is in range of 0 --> 90
 So: Duty should be angle*1679/90

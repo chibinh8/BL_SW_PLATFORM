@@ -872,8 +872,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\BL_App_FollLineRacer\bl_rc_FollowLineRacer.c</PathWithFileName>
-      <FilenameWithoutPath>bl_rc_FollowLineRacer.c</FilenameWithoutPath>
+      <PathWithFileName>..\Src\stm32f4xx_hal_timebase_TIM.c</PathWithFileName>
+      <FilenameWithoutPath>stm32f4xx_hal_timebase_TIM.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -884,8 +884,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\Src\stm32f4xx_hal_timebase_TIM.c</PathWithFileName>
-      <FilenameWithoutPath>stm32f4xx_hal_timebase_TIM.c</FilenameWithoutPath>
+      <PathWithFileName>..\BL_App_AutoRacer\bl_rc_AutoRacer.c</PathWithFileName>
+      <FilenameWithoutPath>bl_rc_AutoRacer.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>

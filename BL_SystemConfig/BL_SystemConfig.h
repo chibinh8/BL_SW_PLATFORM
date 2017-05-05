@@ -1,9 +1,11 @@
 #ifndef BL_SYSTEMCONFIG_H
 #define BL_SYSTEMCONFIG_H
+
 #ifndef STM32F4XX_HAL
 #define STM32F4XX_HAL
 #include "stm32f4xx_hal.h"
 #endif 
+
 #include "BL_SystemSWOption.h"
 #include "cmsis_os.h" 
 #include "adc.h"
@@ -17,4 +19,8 @@
 #include "esp8266.h"
 #include "dem.h"
 #include "bl_app_sdalarm.h"
+#include "pid.h"
+
+#include "bl_rc_AutoRacer.h"
+
 #endif

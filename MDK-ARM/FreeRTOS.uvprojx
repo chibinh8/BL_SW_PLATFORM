@@ -1072,14 +1072,14 @@
               <FilePath>..\BL_App_SDAlarm\bl_app_sdalarm.c</FilePath>
             </File>
             <File>
-              <FileName>bl_rc_FollowLineRacer.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\BL_App_FollLineRacer\bl_rc_FollowLineRacer.c</FilePath>
-            </File>
-            <File>
               <FileName>stm32f4xx_hal_timebase_TIM.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Src\stm32f4xx_hal_timebase_TIM.c</FilePath>
+            </File>
+            <File>
+              <FileName>bl_rc_AutoRacer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\BL_App_AutoRacer\bl_rc_AutoRacer.c</FilePath>
             </File>
           </Files>
         </Group>

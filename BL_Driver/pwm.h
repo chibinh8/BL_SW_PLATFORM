@@ -25,6 +25,7 @@ enum MotorDirec_en{
 #define MOTORDIRECTLEFT_PIN GPIO_PIN_10
 #define MOTORDIRECTRIGHT_PIN  GPIO_PIN_11
 #define MOTORDIRECT_PORT GPIOD
+#define CENTERDUTYRC  10
 
 void InitRCServo(void);
 void SetAngleRCServo(uint32_t duty);
@@ -34,6 +35,8 @@ void InitPwm2Motors(void);
 void SetDutyCycleMotor(uint32_t duty, uint8_t motorindex);
 
 void SetDirectionMotor(uint8_t direction, uint8_t motorindex);
+void SetAngleRCServo(uint32_t duty);
+inline uint16_t bl_pwm_Angle2DutyConv(uint8_t Angle);
 
 static void MX_TIM1_Init(void);
 #endif

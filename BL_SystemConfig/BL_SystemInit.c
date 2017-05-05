@@ -1,6 +1,6 @@
 #include "BL_SystemInit.h"
-#include "dem.h"
-#include "bl_app_sdalarm.h"
+
+#include  "BL_SystemConfig.h"
 
 /** System Clock Configuration
 */
@@ -76,6 +76,8 @@ void BL_SystemInit(void){
 	InitRCServo();	
 	bl_esp_InitESPSys();
 	bl_al_AlarmInit();
+	bl_pid_PIDControllerInit();
+	bl_rc_AutoRacerInit();
   /* USER CODE END 2 */
 	
 }

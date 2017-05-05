@@ -54,7 +54,7 @@
 
 
 
-osThreadId defaultTaskHandle, UserTaskTaskHandle, RT10msTaskHandle;
+osThreadId defaultTaskHandle, UserTaskTaskHandle, RTRealTimeTaskHandle;
 				
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
@@ -66,7 +66,7 @@ osThreadId defaultTaskHandle, UserTaskTaskHandle, RT10msTaskHandle;
 
 void StartDefaultTask(void const * argument);
 void StartUserTask(void const * argument);
-void Start10msTask(void const * argument);
+void StartRealtimeTask(void const * argument);
 
 
 /* USER CODE BEGIN PFP */
@@ -113,8 +113,8 @@ int main(void)
 	 osThreadDef(UserTask, StartUserTask, osPriorityAboveNormal, 1, 128);//128*4 = 512 byte
    UserTaskTaskHandle = osThreadCreate(osThread(UserTask), NULL);	 
 	 
-	 osThreadDef(RT10msTask, Start10msTask, osPriorityAboveNormal, 2, 256);
-   RT10msTaskHandle = osThreadCreate(osThread(RT10msTask), NULL);
+	 osThreadDef(RTRealTimeTask, StartRealtimeTask, osPriorityAboveNormal, 2, 256);
+   RTRealTimeTaskHandle = osThreadCreate(osThread(RTRealTimeTask), NULL);
   /* USER CODE END RTOS_THREADS */
 
   /* USER CODE BEGIN RTOS_QUEUES */
@@ -158,7 +158,7 @@ void StartUserTask(void const * argument)
 		}
 }
 	/* StartDefaultTask function */
-void Start10msTask(void const * argument)
+void StartRealtimeTask(void const * argument)
 {
 	
   /* USER CODE BEGIN 5 */
@@ -167,7 +167,8 @@ void Start10msTask(void const * argument)
   {	
 
 		ADCSensorMaincyclic();
-    osDelay(5); //10ms
+		bl_pid_FollowLineContrWithPIDCyclic();
+    osDelay(5); 
   }
   /* USER CODE END 5 */ 
 }

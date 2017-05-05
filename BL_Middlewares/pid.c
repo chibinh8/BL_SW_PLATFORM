@@ -1,31 +1,152 @@
 #include "pid.h"
 #include "adc.h"
+#include "pwm.h"
+
+#ifdef USE_ARMMATH
+/* Include ARM math */
+#include "arm_math.h"
+#endif
 
 void bl_adc_GetFinalSensorSta(LineState *FinalLineSensorSta);
+int16_t bl_pid_DeviationCal(void);
 
-float bl_pid_KP_fl = 0.0f;
-float bl_pid_KI_fl = 0.0f;
-float bl_pid_KD_fl = 0.0f;
+typedef struct{
+	
+float KP_fl;
+float KI_fl;
+float KD_fl;
+
+}PIDInfor_st;
+
+
+typedef enum{
+IDLE,
+TUNINGPID,
+NORMALCONTROL,
+	
+}PIDWorkSta_en;
+
+
+#define SensorWeight   10u
+#define CONSTRAINT(Val, Max, Min)   (Val>=Max?Max:((Val<Min)?Min:Val))
+#define RCAngleMax									  bl_pwm_Angle2DutyConv(90)//90 degree
+#define RCAngleMin										0u
+#define KD_SAMPLERATE									500u //TASK is run in 5 ms 
+#define SENSORPOS2ANGLEDUTYFAC				2.0f
+
+int16_t bl_pid_SensorFactor[NumofSensor] = {4,3,2,1,1,-2,-3,-4};
+
+PIDInfor_st bl_PIDInfor_st = {0.0f};
+PIDInfor_st PIDValCal_st;
+int16_t bl_pid_LastErrorPID_i16 = 0;
+int16_t bl_pid_ErrorPID_i16;
+int16_t bl_pid_RC_AngComValOut_u16;
+float bl_pid_ControlPIDVal_fl;
+PIDWorkSta_en bl_pid_PIDJobSta_en = IDLE;
+
+/* ARM PID Instance, float_32 format */
+#ifdef USE_ARMMATH
+
+arm_pid_instance_f32 PID;
+
+#endif
+
+void bl_pid_PIDControllerInit(void){
+	
+		#ifdef USE_ARMMATH
+				/* Set PID parameters */
+			/* Set this for your needs */
+			PID.Kp = PIDInfor_st.KP_fl;		/* Proporcional */
+			PID.Ki = PIDInfor_st.KI_fl;		/* Integral */
+			PID.Kd = PIDInfor_st.KD_fl;	/* Derivative */
+			arm_pid_init_f32(&PID, 1);
+	
+		#endif
+}
 
 void bl_pid_PIDTuning(void){
 	
 	;
 }
 
-void bl_pid_SetpointCal(void){
-		
-		;
+static int16_t bl_pid_SetpointCal(void){
+		/*for futher require of setpoint, just modify this api, curenty use zero*/
+		return 0;
 }
 
-void bl_pid_RCAngCal(int16_t DevWithSetpoint){
-		 
-		
-		;
+static inline uint16_t bl_pid_convertpid2servocontrolval(float PIDContrVal_fl){
+	uint16_t duyrcout_u16;
+	if(PIDContrVal_fl>=0){
+		duyrcout_u16 = PIDContrVal_fl*SENSORPOS2ANGLEDUTYFAC;
+	}
+	else{
+		duyrcout_u16 = (-1.0f)*PIDContrVal_fl*SENSORPOS2ANGLEDUTYFAC;
+	}
 	
 }
 
+uint16_t bl_pid_RCAngCal(void){
+			
+		 bl_pid_LastErrorPID_i16 = bl_pid_ErrorPID_i16;
+		 bl_pid_ErrorPID_i16 = bl_pid_DeviationCal();
 
-int16_t bl_pid_DeviationCal(int16_t Setpoint_t, int16_t CurrentVal_s16){
-	 
-	 ;
+		 #ifdef USE_ARMMATH
+
+			bl_pid_ControlPIDVal_fl = arm_pid_f32(&PID, pid_error);
+			bl_pid_RC_AngComValOut_u16 =  bl_pid_convertpid2servocontrolval(bl_pid_ControlPIDVal_fl);
+			bl_pid_RC_AngComValOut_u16 = CONSTRAINT(bl_pid_RC_AngComValOut_u16,RCAngleMax, RCAngleMin);
+			
+			#else
+			//P-D Controller
+			PIDValCal_st.KP_fl = PIDValCal_st.KP_fl*(float)bl_pid_ErrorPID_i16;
+			PIDValCal_st.KD_fl = PIDValCal_st.KD_fl*((float)(bl_pid_ErrorPID_i16-bl_pid_LastErrorPID_i16)/KD_SAMPLERATE);
+			bl_pid_ControlPIDVal_fl = (PIDValCal_st.KP_fl + PIDValCal_st.KD_fl + PIDValCal_st.KI_fl);
+			bl_pid_RC_AngComValOut_u16 =  bl_pid_convertpid2servocontrolval(bl_pid_ControlPIDVal_fl);
+			bl_pid_RC_AngComValOut_u16 = CONSTRAINT(bl_pid_RC_AngComValOut_u16,RCAngleMax, RCAngleMin);	
+			
+			#endif	
+
+			return bl_pid_RC_AngComValOut_u16;	
+} 
+
+void bl_pid_ActionAfterPIDCtrl(uint32_t duty){
+	   SetAngleRCServo(duty);
+}
+
+int16_t bl_pid_DeviationCal(void){
+	 int16_t Setpoint_i16 = bl_pid_SetpointCal();
+	 int32_t SensorWeighTotal_i32;
+	 LineState *FinalLineSensorSta;
+	 /*Get current sensor line state*/
+		bl_adc_GetFinalSensorSta(FinalLineSensorSta);
+	  /*Calculate weight of current sensor line*/
+		for(uint8_t LoopIndex = 0; LoopIndex<NumofSensor;LoopIndex++){
+			SensorWeighTotal_i32 += (int32_t)(SensorWeighTotal_i32*FinalLineSensorSta[LoopIndex]);			
+		}
+		return (SensorWeighTotal_i32-Setpoint_i16);
+}
+
+void bl_pid_FollowLineContrWithPIDCyclic(void){
+		
+		switch(bl_pid_PIDJobSta_en){
+			case IDLE:
+				
+				break;
+			case TUNINGPID:
+				bl_pid_PIDTuning();
+			
+				break;
+			case NORMALCONTROL:
+				(void)bl_pid_RCAngCal();
+			
+				break;
+			default:
+				
+				break;
+			
+		}
+}
+
+uint16_t bl_pid_GetRCContrVal(void){
+	return bl_pid_RC_AngComValOut_u16;
 }

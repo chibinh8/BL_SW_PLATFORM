@@ -1,4 +1,5 @@
 #include "bl_rc_AutoRacer.h"
+#include "pid.h"
 
 typedef enum{
 	
@@ -19,7 +20,10 @@ RacerPatternSta_en bl_rc_SituationAnalysis(void){
 }
 
 RacerPatternSta_en bl_rc_RacerPatternWorkStat_en  = IDLE;
-
+void bl_rc_AutoRacerInit(void){
+	bl_rc_RacerPatternWorkStat_en = IDLE;
+	
+}
 void bl_rc_AutoRacerCyclic(void){
 	
 	bl_rc_RacerPatternWorkStat_en = bl_rc_SituationAnalysis();
@@ -30,7 +34,8 @@ void bl_rc_AutoRacerCyclic(void){
 			break;
 		
 		case FOLLOWLINE:
-			
+			bl_pid_ActionAfterPIDCtrl(bl_pid_GetRCContrVal());
+		
 			break;
 		
 		default:
