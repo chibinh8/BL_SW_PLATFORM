@@ -6,6 +6,7 @@
 #define STM32F4XX_HAL
 #include "stm32f4xx_hal.h"
 #endif 
-void bl_rc_AutoRacerInit(void);
+void bl_app_AutoRacerInit(void);
+void bl_app_AutoRacerCyclic(void);
 
 #endif

@@ -41,6 +41,7 @@
   ******************************************************************************
   */
 /* Includes ------------------------------------------------------------------*/
+
 #include  "BL_SystemConfig.h"
 
 
@@ -168,6 +169,7 @@ void StartRealtimeTask(void const * argument)
 
 		ADCSensorMaincyclic();
 		bl_pid_FollowLineContrWithPIDCyclic();
+		bl_app_AutoRacerCyclic();
     osDelay(5); 
   }
   /* USER CODE END 5 */ 

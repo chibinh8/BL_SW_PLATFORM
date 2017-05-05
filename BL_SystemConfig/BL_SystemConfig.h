@@ -20,7 +20,6 @@
 #include "dem.h"
 #include "bl_app_sdalarm.h"
 #include "pid.h"
-
-#include "bl_rc_AutoRacer.h"
+#include "bl_app_AutoRacer.h"
 
 #endif

@@ -77,7 +77,7 @@ void BL_SystemInit(void){
 	bl_esp_InitESPSys();
 	bl_al_AlarmInit();
 	bl_pid_PIDControllerInit();
-	bl_rc_AutoRacerInit();
+	bl_app_AutoRacerInit();
   /* USER CODE END 2 */
 	
 }

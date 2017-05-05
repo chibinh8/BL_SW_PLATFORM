@@ -82,7 +82,7 @@ static inline uint16_t bl_pid_convertpid2servocontrolval(float PIDContrVal_fl){
 	else{
 		duyrcout_u16 = (-1.0f)*PIDContrVal_fl*SENSORPOS2ANGLEDUTYFAC;
 	}
-	
+	return duyrcout_u16;
 }
 
 uint16_t bl_pid_RCAngCal(void){
