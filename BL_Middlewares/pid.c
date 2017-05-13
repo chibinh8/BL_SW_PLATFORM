@@ -11,21 +11,36 @@
 LineState * bl_adc_GetFinalSensorSta(void);
 int16_t bl_pid_DeviationCal(void);
 
+static int16_t bl_pid_SetpointCal(void);
 
+extern const LineState FinalLineSensorState[NumofSensor];
+
+typedef struct{
+	int16_t SensorValMin_i16;
+	int16_t SensorValMax_i16;
+	uint8_t RCDuty_u8;	
+}MapDutySSVal_st;
+
+const MapDutySSVal_st bl_pid_MappingRCdutySSValTbl[1]={
+	
+	{12,8,40},
+//	{b,4},
+	
+};
 
 #define SensorWeight   10u
 #define CONSTRAINT(Val, Max, Min)   (Val>=Max?Max:((Val<Min)?Min:Val))
 #define RCAngleMax									  115u
 #define RCAngleMin										40u
 #define KD_SAMPLERATE									500u //TASK is run in 5 ms 
-#define SENSORPOS2ANGLEDUTYFAC				100.0f
+#define SENSORPOS2ANGLEDUTYFAC				(float)(RCAngleMax-RCAngleMin)/16
 
-int16_t bl_pid_SensorFactor[NumofSensor] = {4,3,2,1,-1,-2,-3,-4};
+int16_t bl_pid_SensorFactor[NumofSensor] = {8,4,2,1,-1,-2,-4,-8};
 
-PIDInfor_st bl_PIDInfor_st = {1.0f, 2.0f, 0.0f};
+PIDInfor_st bl_PIDInfor_st = {5.0f, 2.0f, 0.0f};
 PIDInfor_st PIDValCal_st;
 int16_t bl_pid_LastErrorPID_i16 = 0;
-int16_t bl_pid_ErrorPID_i16;
+int16_t bl_pid_ErrorPID_i16 = 0;
 uint16_t bl_pid_RC_AngComValOut_u16;
 float bl_pid_ControlPIDVal_fl;
 PIDWorkSta_en bl_pid_PIDJobSta_en = IDLE;
@@ -61,7 +76,7 @@ void bl_pid_PIDTuning(void){
 
 static int16_t bl_pid_SetpointCal(void){
 		/*for futher require of setpoint, just modify this api, curenty use zero*/
-		return 0;
+		return 196;
 }
 
 static inline uint16_t bl_pid_convertpid2servocontrolval(float PIDContrVal_fl){
@@ -90,7 +105,7 @@ uint16_t bl_pid_RCAngCal(void){
 			//P-D Controller
 			PIDValCal_st.KP_fl = bl_PIDInfor_st.KP_fl*(float)bl_pid_ErrorPID_i16;
 			PIDValCal_st.KD_fl = bl_PIDInfor_st.KD_fl*((float)(bl_pid_ErrorPID_i16-bl_pid_LastErrorPID_i16)/KD_SAMPLERATE);
-			bl_pid_ControlPIDVal_fl = (PIDValCal_st.KI_fl + PIDValCal_st.KD_fl + PIDValCal_st.KI_fl);
+			bl_pid_ControlPIDVal_fl = (PIDValCal_st.KP_fl  + PIDValCal_st.KD_fl + PIDValCal_st.KI_fl);
 			bl_pid_RC_AngComValOut_u16 =  bl_pid_convertpid2servocontrolval(bl_pid_ControlPIDVal_fl);
 			//bl_pid_RC_AngComValOut_u16 = CONSTRAINT(bl_pid_RC_AngComValOut_u16,RCAngleMax, RCAngleMin);	
 			
@@ -106,12 +121,11 @@ void bl_pid_ActionAfterPIDCtrl(uint32_t duty){
 int16_t bl_pid_DeviationCal(void){
 	 int16_t Setpoint_i16 = bl_pid_SetpointCal();
 	 int16_t SensorWeighTotal_i16;
-	 LineState *FinalLineSensorSta;
 	 /*Get current sensor line state*/
-		FinalLineSensorSta = bl_adc_GetFinalSensorSta();
+		LineState *FinalLineSensorSta = bl_adc_GetFinalSensorSta();
 	  /*Calculate weight of current sensor line*/
 		for(uint8_t LoopIndex = 0; LoopIndex<NumofSensor;LoopIndex++){
-			SensorWeighTotal_i16 += (int16_t)(bl_pid_SensorFactor[LoopIndex]*((uint8_t)(*(FinalLineSensorSta+LoopIndex))));			
+			SensorWeighTotal_i16 += (int16_t)(bl_pid_SensorFactor[LoopIndex]*((int16_t)(FinalLineSensorState[LoopIndex])));			
 		}
 		return (int16_t)(SensorWeighTotal_i16-Setpoint_i16);
 }
@@ -120,7 +134,10 @@ void bl_pid_FollowLineContrWithPIDCyclic(void){
 		static uint32_t bl_pid_currtime_u32 = 0;
 		switch(bl_pid_PIDJobSta_en){
 			case IDLE:
-				
+				GetCurrentTimestamp(&bl_pid_currtime_u32);
+				if(TRUE==CheckTimestampElapsed(bl_pid_currtime_u32, (uint32_t)1000u)){
+								bl_pid_PIDJobSta_en = NORMALCONTROL;
+				}				
 				break;
 			case TUNINGPID:
 				switch(bl_pid_PIDTuningSubSta_u8){

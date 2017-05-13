@@ -81,7 +81,7 @@ After calibration: Duty is in range 40->115
 */
 void SetAngleRCServo(uint32_t duty){
 	if(duty<=MINRCDUTY) duty = MINRCDUTY;
-	else if(duty<=MAXRCDUTY) duty = MAXRCDUTY;
+	else if(duty>=MAXRCDUTY) duty = MAXRCDUTY;
 	
 	if(duty>=htim3.Init.Period)
 		__HAL_TIM_SetCompare(&htim3, TIM_CHANNEL_1, htim3.Init.Period);
