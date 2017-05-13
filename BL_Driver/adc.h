@@ -20,9 +20,9 @@ typedef struct{
 		
 }BL_AdcThres_Type;
 
-typedef enum {
-		BLACK,
+typedef enum {		
 		WHITE,
+		BLACK,
 		UNDEFINE,
 }LineState;
 
@@ -50,7 +50,7 @@ uint8_t SaveADCThreshold2NVM(const BL_AdcThres_Type AdcThres);
 
 void ReadADCThresholdfromNVM(uint16_t *val2write);
 
-void bl_adc_GetFinalSensorSta(LineState *FinalLineSensorSta);
+LineState * bl_adc_GetFinalSensorSta(void);
 
 #endif
 

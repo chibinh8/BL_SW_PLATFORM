@@ -498,6 +498,6 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc){
 	
 }
 
-void bl_adc_GetFinalSensorSta(LineState *FinalLineSensorSta){
-	 FinalLineSensorSta = &FinalLineSensorState[0];
+LineState * bl_adc_GetFinalSensorSta(void){
+	 return  &FinalLineSensorState[0];
 }

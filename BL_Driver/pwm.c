@@ -77,8 +77,12 @@ uint16_t bl_pwm_Angle2DutyConv(uint8_t Angle){
 RC servo angle is in range of 0 --> 90
 So: Duty should be angle*1679/90
 Example: 45 degree --> duty = 839
+After calibration: Duty is in range 40->115
 */
 void SetAngleRCServo(uint32_t duty){
+	if(duty<=MINRCDUTY) duty = MINRCDUTY;
+	else if(duty<=MAXRCDUTY) duty = MAXRCDUTY;
+	
 	if(duty>=htim3.Init.Period)
 		__HAL_TIM_SetCompare(&htim3, TIM_CHANNEL_1, htim3.Init.Period);
 	else

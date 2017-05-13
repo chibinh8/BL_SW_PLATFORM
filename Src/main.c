@@ -142,6 +142,7 @@ int main(void)
 
 
 /* USER CODE BEGIN 4 */
+uint16_t bl_db_rcduty_u8 = 0;
 
 void StartBackgroundTask(void const * argument)
 {

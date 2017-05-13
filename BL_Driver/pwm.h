@@ -26,6 +26,9 @@ enum MotorDirec_en{
 #define MOTORDIRECTRIGHT_PIN  GPIO_PIN_11
 #define MOTORDIRECT_PORT GPIOD
 #define CENTERDUTYRC  10
+#define MINRCDUTY			40
+#define MAXRCDUTY			115
+#define CENTERRCDUTY	80
 
 void InitRCServo(void);
 void SetAngleRCServo(uint32_t duty);
