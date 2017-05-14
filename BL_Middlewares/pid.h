@@ -21,6 +21,7 @@ typedef enum{
 IDLE,
 TUNINGPID,
 NORMALCONTROL,
+WAITFROMIDLE,
 	
 }PIDWorkSta_en;
 

@@ -908,11 +908,6 @@
               <FilePath>..\BL_Driver\uart.c</FilePath>
             </File>
             <File>
-              <FileName>adc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\BL_Driver\adc.c</FilePath>
-            </File>
-            <File>
               <FileName>gpio.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\BL_Driver\gpio.c</FilePath>
@@ -931,6 +926,11 @@
               <FileName>flash.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\BL_Driver\flash.c</FilePath>
+            </File>
+            <File>
+              <FileName>adc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\BL_Driver\adc.c</FilePath>
             </File>
             <File>
               <FileName>esp8266.c</FileName>
