@@ -37,14 +37,14 @@ typedef enum{
 #define KD_SAMPLERATE									1u //TASK is run in 5 ms 
 #define SENSORPOS2ANGLEDUTYFAC				(float)(RCAngleMax-RCAngleMin)/24
 
-int16_t bl_pid_SensorFactor[NumofSensor] = {8,4,2,1,-1,0,-4,-8};
+int16_t bl_pid_SensorFactor[NumofSensor] = {8,4,2,1,-1,0,-4,0};
 
 uint8_t bl_pid_CenterRCDuty_u8;
 /*Get current sensor line state*/
 
 uint8_t bl_pid_CenterValFilterCnt_u8 = CENTERRCDUTY;
 
-PIDInfor_st bl_PIDInfor_st = {1.0f, 2.0f, 0.001f};
+PIDInfor_st bl_PIDInfor_st = {2.0f, 0.05f, 2.0f};
 PIDInfor_st PIDValCal_st;
 int16_t bl_pid_LastErrorPID_i16 = 0;
 int16_t bl_pid_ErrorPID_i16 = 0;
@@ -133,7 +133,7 @@ uint16_t bl_pid_RCAngCal(void){
 			//P-D Controller
 			PIDValCal_st.KP_fl = bl_PIDInfor_st.KP_fl*(float)bl_pid_ErrorPID_i16;
 			PIDValCal_st.KD_fl = bl_PIDInfor_st.KD_fl*((float)(bl_pid_ErrorPID_i16-bl_pid_LastErrorPID_i16)/KD_SAMPLERATE);
-			PIDValCal_st.KI_fl += bl_PIDInfor_st.KI_fl*bl_pid_ErrorPID_i16;
+			PIDValCal_st.KI_fl += bl_PIDInfor_st.KI_fl*(float)bl_pid_ErrorPID_i16;
 			bl_pid_ControlPIDVal_fl = (PIDValCal_st.KP_fl  + PIDValCal_st.KD_fl + PIDValCal_st.KI_fl);
 			bl_pid_RC_AngComValOut_u16 =  bl_pid_convertpid2servocontrolval(bl_pid_ControlPIDVal_fl);
 			bl_pid_RC_AngComValOut_u16 = CONSTRAINT(bl_pid_RC_AngComValOut_u16,MAXRCDUTY, MINRCDUTY);	
