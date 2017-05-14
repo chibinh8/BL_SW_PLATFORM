@@ -37,7 +37,7 @@ void BL_ADCInit(void);
 
 void ReadSensor(volatile uint16_t* outsensorval, ADC_HandleTypeDef *hadc, uint8_t channel);
 
-uint8_t ReadAllFinalSensorfromLine(uint16_t *AllsensorFinalVal);
+BOOL ReadAllFinalSensorfromLine(uint16_t *AllsensorFinalVal);
 
 void ReadAllRawSensorfromLine(void);
 
