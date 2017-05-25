@@ -1,6 +1,6 @@
 # BL_SW_FLATFORM
 The personal DIY flatform.
-   Application:
+   Feature:
  - RTOS based Software
  - AUTOSAR architecture oriented
  - Provide BSW layer for application
