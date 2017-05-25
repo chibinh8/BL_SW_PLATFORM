@@ -2,6 +2,7 @@
 The personal DIY flatform.
    Application:
  - RTOS based Software
+ - AUTOSAR architecture oriented
  - Provide BSW layer for application
  - Automated Racing line following car with PID algorithm inside
  - Diagnostic service support and control ECU REMOTELY using WIFI  
