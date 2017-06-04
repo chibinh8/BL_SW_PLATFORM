@@ -21,5 +21,6 @@
 #include "bl_app_sdalarm.h"
 #include "pid.h"
 #include "bl_app_AutoRacer.h"
+#include "watchdog.h"
 
 #endif

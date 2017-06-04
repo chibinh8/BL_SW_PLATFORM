@@ -70,6 +70,7 @@ void BL_SystemInit(void){
   MX_TIM6_Init();
 	#endif
   MX_USART_UART_Init();
+	bl_wd_Init();//watchdog
 	
 	InitPwm2Motors();
   /* USER CODE BEGIN 2 */ 

@@ -55,7 +55,7 @@
 
 
 
-osThreadId defaultTaskHandle, BackgroundTaskTaskHandle, RTRealTimeTaskHandle;
+osThreadId defaultTaskHandle, BackgroundTaskTaskHandle, RTRealTimeTaskHandle, WatchdogTaskHandle;
 				
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
@@ -68,7 +68,7 @@ osThreadId defaultTaskHandle, BackgroundTaskTaskHandle, RTRealTimeTaskHandle;
 void StartDefaultTask(void const * argument);
 void StartBackgroundTask(void const * argument);
 void StartRealtimeTask(void const * argument);
-
+void StartWatchdogTask(void const * argument);
 
 /* USER CODE BEGIN PFP */
 /* Private function prototypes -----------------------------------------------*/
@@ -116,6 +116,8 @@ int main(void)
 	 
 	 osThreadDef(RTRealTimeTask, StartRealtimeTask, osPriorityAboveNormal, 2, 256);
    RTRealTimeTaskHandle = osThreadCreate(osThread(RTRealTimeTask), NULL);
+	 osThreadDef(WatchdogTask, StartWatchdogTask, osPriorityNormal, 0, 50);
+	 WatchdogTaskHandle = osThreadCreate(osThread(WatchdogTask), NULL);
   /* USER CODE END RTOS_THREADS */
 
   /* USER CODE BEGIN RTOS_QUEUES */
@@ -157,6 +159,7 @@ void StartBackgroundTask(void const * argument)
 			bl_al_AlarmCyclic();
 			ProcessDiagserviceCyclicMain();		
 			bl_fl_NVMOperationCyclic();
+			bl_wd_TaskAlive(0x01);
 			osDelay(100);
 		}
 }
@@ -172,6 +175,7 @@ void StartRealtimeTask(void const * argument)
 		ADCSensorMaincyclic();
 		bl_pid_FollowLineContrWithPIDCyclic();
 		bl_app_AutoRacerCyclic();
+		bl_wd_TaskAlive(0x02);
     osDelay(5); 
   }
   /* USER CODE END 5 */ 
@@ -193,6 +197,20 @@ void StartDefaultTask(void const * argument)
   /* USER CODE END 5 */ 
 }
 
+void StartWatchdogTask(void const * argument)
+{
+  /* USER CODE BEGIN 5 */
+	
+	/* USER CODE END 5 */
+  /* Infinite loop */
+		for(;;)
+		{  
+			if(bl_wd_IsAllTaskAli()==TRUE)
+				bl_wd_KickWatchdog();
+			
+			osDelay(150);
+		}
+}
 /**
   * @}
 */ 
