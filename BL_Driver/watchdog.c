@@ -44,4 +44,5 @@ BOOL bl_wd_IsAllTaskAli(void){
 void bl_wd_KickWatchdog(void){
 	/* Reload IWDG counter */
 	IWDG->KR = 0xAAAA;
+	bl_wd_TaskAliFlag_u8 = 0;
 }
