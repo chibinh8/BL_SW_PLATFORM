@@ -207,6 +207,7 @@ void StartWatchdogTask(void const * argument)
 		{  
 			if(bl_wd_IsAllTaskAli()==TRUE)
 				bl_wd_KickWatchdog();
+			//else that is a failure in system (task is dead) then Watchdog reachs Reset threshold then do a Reset system
 			
 			osDelay(150);
 		}
