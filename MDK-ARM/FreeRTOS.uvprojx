@@ -353,7 +353,7 @@
           <Cads>
             <interw>1</interw>
             <Optim>4</Optim>
-            <oTime>0</oTime>
+            <oTime>1</oTime>
             <SplitLS>0</SplitLS>
             <OneElfS>1</OneElfS>
             <Strict>0</Strict>
@@ -374,7 +374,7 @@
               <MiscControls>--C99</MiscControls>
               <Define></Define>
               <Undefine></Undefine>
-              <IncludePath>../Inc;  ../Drivers/STM32F4xx_HAL_Driver/Inc;../BL_App_AutoRacer; ../BL_SystemConfig;../BL_App_SDAlarm;  ../BL_Driver; ../BL_Middlewares;../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy;  ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F;  ../Middlewares/Third_Party/FreeRTOS/Source/include;  ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS;  ../Drivers/CMSIS/Include;  ../Drivers/CMSIS/Device/ST/STM32F4xx/Include</IncludePath>
+              <IncludePath>../Inc;  ../Drivers/STM32F4xx_HAL_Driver/Inc;../BL_App_AutoRacer; ../BL_SystemConfig;../BL_App_Clock;  ../BL_Driver; ../BL_Middlewares;../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy;  ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F;  ../Middlewares/Third_Party/FreeRTOS/Source/include;  ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS;  ../Drivers/CMSIS/Include;  ../Drivers/CMSIS/Device/ST/STM32F4xx/Include</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -1077,11 +1077,6 @@
               <FilePath>../Src/freertos.c</FilePath>
             </File>
             <File>
-              <FileName>bl_app_sdalarm.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\BL_App_SDAlarm\bl_app_sdalarm.c</FilePath>
-            </File>
-            <File>
               <FileName>stm32f4xx_hal_timebase_TIM.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Src\stm32f4xx_hal_timebase_TIM.c</FilePath>
@@ -1090,6 +1085,11 @@
               <FileName>bl_app_AutoRacer.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\BL_App_AutoRacer\bl_app_AutoRacer.c</FilePath>
+            </File>
+            <File>
+              <FileName>bl_app_clock.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\BL_App_Clock\bl_app_clock.c</FilePath>
             </File>
           </Files>
         </Group>
