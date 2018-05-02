@@ -1,5 +1,5 @@
-# BL_SW_FLATFORM
-The personal DIY flatform.
+# BL_SW_PLATFORM
+The personal DIY platform.
    Feature:
  - RTOS based Software
  - Provide BSW layer for application - AUTOSAR architecture following(target)
